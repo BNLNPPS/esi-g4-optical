@@ -27,28 +27,24 @@
 
 //---
 
-DetectorConstruction::DetectorConstruction() : G4VUserDetectorConstruction(), fdetectorLogical(0), fVisAttributes() {fMessenger = new OpticalMessenger(this);}
+DetectorConstruction::DetectorConstruction(): G4VUserDetectorConstruction(), fdetectorLogical(0), fVisAttributes() {fMessenger = new OpticalMessenger(this);}
 
 //---
 
-DetectorConstruction::~DetectorConstruction()
-{
+DetectorConstruction::~DetectorConstruction() {
   delete fMessenger;
-  for (G4int i = 0; i < G4int(fVisAttributes.size()); ++i)
-  {
-    delete fVisAttributes[i];
-  }
+  for (G4int i = 0; i < G4int(fVisAttributes.size()); ++i) {delete fVisAttributes[i];}
 }
 
 // ---
 
-G4VPhysicalVolume *DetectorConstruction::Construct()
-{
-  // Construct materials
+G4VPhysicalVolume *DetectorConstruction::Construct() {
+
   ConstructMaterials();
+
   G4Material *air = G4Material::GetMaterial("G4_AIR");
-  G4Material *argonGas = G4Material::GetMaterial("G4_Ar");
-  G4Material *scintillator = G4Material::GetMaterial("G4_PLASTIC_SC_VINYLTOLUENE");
+  // G4Material *argonGas = G4Material::GetMaterial("G4_Ar");
+  // G4Material *scintillator = G4Material::GetMaterial("G4_PLASTIC_SC_VINYLTOLUENE");
   G4bool checkOverlaps = true;
 
   G4VSolid *worldSolid = new G4Box("worldBox", 5. * m, 5. * m, 5. * m);
@@ -62,12 +58,9 @@ G4VPhysicalVolume *DetectorConstruction::Construct()
 
   new G4PVPlacement(0, G4ThreeVector(0., 0., -5. * m), apparatusLogical, "apparatusPhysical", worldLogical, false, 0, checkOverlaps);
 
-  // G4double x = 0. //-5.*m * std::sin(fArmAngle);
-  // G4double z = 0. // 5.*m * std::cos(fArmAngle);
-
   // Detector
   G4VSolid *detectorSolid = new G4Box("detectorBox", 10. * cm, 10. * cm, 10. * cm);
-  fdetectorLogical = new G4LogicalVolume(detectorSolid, scintillator, "detectorLogical");
+  fdetectorLogical = new G4LogicalVolume(detectorSolid, fdetectorMaterial, "detectorLogical");
 
   new G4PVPlacement(0, G4ThreeVector(0., 0., -1.5 * m), fdetectorLogical, "detectorPhysical", apparatusLogical, false, 0, checkOverlaps);
 
@@ -103,12 +96,26 @@ void DetectorConstruction::ConstructSDandField() {}
 
 void DetectorConstruction::ConstructMaterials()
 {
+  G4double a, z, density;
+  G4int nelements;
+
+  // -mxp- top part is legacy (from the original example)
   G4NistManager *nistManager = G4NistManager::Instance();
 
   nistManager->FindOrBuildMaterial("G4_AIR");                     // Air
-  nistManager->FindOrBuildMaterial("G4_Ar");                      // Argon gas
-  nistManager->FindOrBuildMaterial("G4_PLASTIC_SC_VINYLTOLUENE"); // C_9H_10
+  // nistManager->FindOrBuildMaterial("G4_Ar");                      // Argon gas
+  // nistManager->FindOrBuildMaterial("G4_PLASTIC_SC_VINYLTOLUENE"); // C_9H_10
 
   G4cout << G4endl << "The materials defined are : " << G4endl << G4endl;
+
+  // -mxp- This is from OpNovice
+    // Water
+  auto H            = new G4Element("Hydrogen", "H", z = 1, a = 1.01 * g / mole);
+  auto O            = new G4Element("Oxygen", "O", z = 8, a = 16.00 * g / mole);
+  fdetectorMaterial = new G4Material("Water", density = 1.0 * g / cm3, nelements = 2);
+  fdetectorMaterial->AddElement(H, 2);
+  fdetectorMaterial->AddElement(O, 1);
+
+
   G4cout << *(G4Material::GetMaterialTable()) << G4endl;
 }

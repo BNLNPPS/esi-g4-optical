@@ -73,9 +73,9 @@ private:
     // -mxp-
     // G4GenericMessenger* fMessenger;
 
-    OpticalMessenger* fMessenger;
-    
-    G4LogicalVolume* fdetectorLogical;
+    OpticalMessenger*   fMessenger;
+    G4LogicalVolume*    fdetectorLogical;
+    G4Material*         fdetectorMaterial;
     
     std::vector<G4VisAttributes*> fVisAttributes;
 
