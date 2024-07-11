@@ -3,7 +3,7 @@
 #
 # Set verbosity
 #
-/control/verbose 2
+/control/verbose 0
 #
 # Use this open statement to create an OpenGL view:
 /vis/open OGL 600x600-0+0
@@ -69,7 +69,7 @@
 #
 # Re-establish auto refreshing and verbosity:
 /vis/viewer/set/autoRefresh true
-/vis/verbose warnings
+/vis/verbose errors
 #
 # For file-based drivers, use this to create an empty detector view:
 #/vis/viewer/flush

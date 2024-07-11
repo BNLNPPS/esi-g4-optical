@@ -42,7 +42,6 @@
 
 #include <vector>
 
-
 // -mxp-
 class OpticalMessenger;
 
@@ -62,8 +61,7 @@ public:
     //master thread and all geometry built here is shared among threads
     virtual G4VPhysicalVolume* Construct();
     
-    //Some components of geometry are thread pricate:
-    //SensitiveDetectors and megnetic field.
+    //Some components of geometry are thread pricate: SensitiveDetectors and megnetic field.
     //Build them here because this method is called by each thread
     virtual void ConstructSDandField();
 

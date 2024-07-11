@@ -54,12 +54,19 @@ DetectorConstruction::~DetectorConstruction()
 G4VPhysicalVolume *DetectorConstruction::Construct()
 {
 
+  
+  // NB. This is an important method as custom materials with
+  // their propterties are defined:
   ConstructMaterials();
 
   G4Material *air = G4Material::GetMaterial("G4_AIR");
-  // G4Material *argonGas = G4Material::GetMaterial("G4_Ar");
-  // G4Material *scintillator = G4Material::GetMaterial("G4_PLASTIC_SC_VINYLTOLUENE");
+
   G4bool checkOverlaps = true;
+
+  // **********************************************************************
+  // **********************************************************************
+  // **********************************************************************
+  // We'll build the world, the apparatus and finally our optical detector
 
   G4VSolid *worldSolid = new G4Box("worldBox", 5. * m, 5. * m, 5. * m);
 
@@ -78,6 +85,12 @@ G4VPhysicalVolume *DetectorConstruction::Construct()
 
   new G4PVPlacement(0, G4ThreeVector(0., 0., -1.5 * m), fdetectorLogical, "detectorPhysical", apparatusLogical, false, 0, checkOverlaps);
 
+
+  // FIXME -- surfaces added here, from OpNoviceDetectorCtor
+
+  // **********************************************************************
+  // **********************************************************************
+  // **********************************************************************
   // visualization attributes
 
   G4VisAttributes *visAttributes = new G4VisAttributes(G4Colour(1.0, 1.0, 1.0));
@@ -137,14 +150,24 @@ void DetectorConstruction::ConstructMaterials() {
   // createNewKey and spline both take their default values of false.
   // Need to specify the number of entries (1) in the arrays, as an argument
   // to AddProperty.
+  
+
+  // -mxp- this original code throws a warning exception,
+  // but apparently you need to "init" a property first. Hmm.
   G4int numEntries = 1;
   fmpt->AddProperty("RINDEX", &photonEnergy[0], &refractiveIndex1[0], numEntries);
+
+
+  for(size_t i = 1; i < photonEnergy.size(); ++i) {
+    fmpt->AddEntry("RINDEX", photonEnergy[i], refractiveIndex1[i]);
+  }
+
 
   // Check that group velocity is calculated from RINDEX
   if(fmpt->GetProperty("RINDEX")->GetVectorLength() != fmpt->GetProperty("GROUPVEL")->GetVectorLength()) {
     G4ExceptionDescription ed;
     ed << "Error calculating group velocities. Incorrect number of entries in group velocity material property vector.";
-    G4Exception("OpNovice::OpNoviceDetectorConstruction", "OpNovice001", FatalException, ed);
+    G4Exception("DetectorConstruction", "optical1", FatalException, ed);
   }
 
   // Adding a property from two std::vectors. Argument createNewKey is false and spline is true.
@@ -155,9 +178,16 @@ void DetectorConstruction::ConstructMaterials() {
   fmpt->AddConstProperty("MIEHG_BACKWARD", mie_water_const[1]);
   fmpt->AddConstProperty("MIEHG_FORWARD_RATIO", mie_water_const[2]);
 
-  G4cout << "Water G4MaterialPropertiesTable:" << G4endl;
-  fmpt->DumpTable();
 
+  G4cout << *(G4Material::GetMaterialTable()) << G4endl;
+
+  // G4cout << "Water G4MaterialPropertiesTable:" << G4endl;
+  // fmpt->DumpTable();
+
+  fdetectorMaterial->SetMaterialPropertiesTable(fmpt);
+
+  // Set the Birks Constant for the Water scintillator
+  fdetectorMaterial->GetIonisation()->SetBirksConstant(0.126 * mm / MeV);
 
 }
 

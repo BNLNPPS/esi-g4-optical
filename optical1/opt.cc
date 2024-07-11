@@ -26,7 +26,7 @@ int main(int argc,char** argv)
     
     runManager->SetUserInitialization(new DetectorConstruction);
     
-    //The Physics
+    //The Physics -- 
     G4VModularPhysicsList* physicsList = new FTFP_BERT(0);
     physicsList->RegisterPhysics(new G4StepLimiterPhysics());
     runManager->SetUserInitialization(physicsList);
