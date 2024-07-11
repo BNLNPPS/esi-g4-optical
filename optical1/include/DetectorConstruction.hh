@@ -35,6 +35,8 @@
 #include "G4VUserDetectorConstruction.hh"
 #include <CLHEP/Units/SystemOfUnits.h>
 
+#include "G4Material.hh"
+
 #include "G4RotationMatrix.hh"
 #include "G4FieldManager.hh"
 
@@ -76,6 +78,7 @@ private:
     OpticalMessenger*   fMessenger;
     G4LogicalVolume*    fdetectorLogical;
     G4Material*         fdetectorMaterial;
+    G4MaterialPropertiesTable* fmpt;
     
     std::vector<G4VisAttributes*> fVisAttributes;
 

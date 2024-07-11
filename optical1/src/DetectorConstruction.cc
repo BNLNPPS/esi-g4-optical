@@ -25,20 +25,34 @@
 #include "G4ios.hh"
 #include "G4SystemOfUnits.hh"
 
-//---
-
-DetectorConstruction::DetectorConstruction(): G4VUserDetectorConstruction(), fdetectorLogical(0), fVisAttributes() {fMessenger = new OpticalMessenger(this);}
+#include "mpt.hh"
 
 //---
 
-DetectorConstruction::~DetectorConstruction() {
+DetectorConstruction::DetectorConstruction() : G4VUserDetectorConstruction(),
+                                               fdetectorLogical(0),
+                                               fdetectorMaterial(0),
+                                               fmpt(0),
+                                               fVisAttributes()
+{
+  fMessenger = new OpticalMessenger(this);
+}
+
+//---
+
+DetectorConstruction::~DetectorConstruction()
+{
   delete fMessenger;
-  for (G4int i = 0; i < G4int(fVisAttributes.size()); ++i) {delete fVisAttributes[i];}
+  for (G4int i = 0; i < G4int(fVisAttributes.size()); ++i)
+  {
+    delete fVisAttributes[i];
+  }
 }
 
 // ---
 
-G4VPhysicalVolume *DetectorConstruction::Construct() {
+G4VPhysicalVolume *DetectorConstruction::Construct()
+{
 
   ConstructMaterials();
 
@@ -85,7 +99,7 @@ G4VPhysicalVolume *DetectorConstruction::Construct() {
   visAttributes->SetVisibility(false);
   fVisAttributes.push_back(visAttributes);
 
-  return worldPhysical; // return the world physical volume 
+  return worldPhysical; // return the world physical volume
 }
 
 // ---
@@ -94,28 +108,67 @@ void DetectorConstruction::ConstructSDandField() {}
 
 // ---
 
-void DetectorConstruction::ConstructMaterials()
-{
+void DetectorConstruction::ConstructMaterials() {
   G4double a, z, density;
   G4int nelements;
+  
+  G4double energyArray[]{ 2.034 * eV, 4.136 * eV };
+  G4int lenArray = 2;
 
-  // -mxp- top part is legacy (from the original example)
+  // ---
   G4NistManager *nistManager = G4NistManager::Instance();
 
-  nistManager->FindOrBuildMaterial("G4_AIR");                     // Air
-  // nistManager->FindOrBuildMaterial("G4_Ar");                      // Argon gas
-  // nistManager->FindOrBuildMaterial("G4_PLASTIC_SC_VINYLTOLUENE"); // C_9H_10
+  nistManager->FindOrBuildMaterial("G4_AIR"); // Air
 
   G4cout << G4endl << "The materials defined are : " << G4endl << G4endl;
 
   // -mxp- This is from OpNovice
-    // Water
-  auto H            = new G4Element("Hydrogen", "H", z = 1, a = 1.01 * g / mole);
-  auto O            = new G4Element("Oxygen", "O", z = 8, a = 16.00 * g / mole);
+  // Water
+  auto H = new G4Element("Hydrogen", "H", z = 1, a = 1.01 * g / mole);
+  auto O = new G4Element("Oxygen", "O", z = 8, a = 16.00 * g / mole);
   fdetectorMaterial = new G4Material("Water", density = 1.0 * g / cm3, nelements = 2);
   fdetectorMaterial->AddElement(H, 2);
   fdetectorMaterial->AddElement(O, 1);
 
+  fmpt = new G4MaterialPropertiesTable();
 
-  G4cout << *(G4Material::GetMaterialTable()) << G4endl;
+  // Values can be added to the material property table individually.
+  // With this method, spline interpolation cannot be set. Arguments
+  // createNewKey and spline both take their default values of false.
+  // Need to specify the number of entries (1) in the arrays, as an argument
+  // to AddProperty.
+  G4int numEntries = 1;
+  fmpt->AddProperty("RINDEX", &photonEnergy[0], &refractiveIndex1[0], numEntries);
+
+  // Check that group velocity is calculated from RINDEX
+  if(fmpt->GetProperty("RINDEX")->GetVectorLength() != fmpt->GetProperty("GROUPVEL")->GetVectorLength()) {
+    G4ExceptionDescription ed;
+    ed << "Error calculating group velocities. Incorrect number of entries in group velocity material property vector.";
+    G4Exception("OpNovice::OpNoviceDetectorConstruction", "OpNovice001", FatalException, ed);
+  }
+
+  // Adding a property from two std::vectors. Argument createNewKey is false and spline is true.
+  fmpt->AddProperty("ABSLENGTH", photonEnergy, absorption, false, true);
+
+  fmpt->AddProperty("MIEHG", energy_water, mie_water, false, true);
+  fmpt->AddConstProperty("MIEHG_FORWARD", mie_water_const[0]);
+  fmpt->AddConstProperty("MIEHG_BACKWARD", mie_water_const[1]);
+  fmpt->AddConstProperty("MIEHG_FORWARD_RATIO", mie_water_const[2]);
+
+  G4cout << "Water G4MaterialPropertiesTable:" << G4endl;
+  fmpt->DumpTable();
+
+
 }
+
+  // ATTIC
+  // See nistManager in the code, this part is retired for now
+  // nistManager->FindOrBuildMaterial("G4_Ar");                      // Argon gas
+  // nistManager->FindOrBuildMaterial("G4_PLASTIC_SC_VINYLTOLUENE"); // C_9H_10
+
+  // G4cout << *(G4Material::GetMaterialTable()) << G4endl;
+  // int L = photonEnergy.size();
+  // std::cout << L << std::endl;
+  // for (G4int i = 0; i < G4int(photonEnergy.size()); ++i) {
+  //   std::cout << photonEnergy[i] << std::endl;
+  // }
