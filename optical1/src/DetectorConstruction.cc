@@ -9,8 +9,9 @@
 #include "G4VSolid.hh"
 #include "G4Box.hh"
 #include "G4Tubs.hh"
-#include "G4LogicalVolume.hh"
+
 #include "G4VPhysicalVolume.hh"
+
 #include "G4PVPlacement.hh"
 #include "G4PVParameterised.hh"
 #include "G4PVReplica.hh"
@@ -30,8 +31,9 @@
 //---
 
 DetectorConstruction::DetectorConstruction() : G4VUserDetectorConstruction(),
-                                               fdetectorLogical(0),
-                                               fdetectorMaterial(0),
+                                               fDetectorLogical(0),
+                                               fDetectorMaterial(0),
+                                               fDetectorSurface(0),
                                                fmpt(0),
                                                fVisAttributes()
 {
@@ -81,12 +83,14 @@ G4VPhysicalVolume *DetectorConstruction::Construct()
 
   // Detector
   G4VSolid *detectorSolid = new G4Box("detectorBox", 10. * cm, 10. * cm, 10. * cm);
-  fdetectorLogical = new G4LogicalVolume(detectorSolid, fdetectorMaterial, "detectorLogical");
+  fDetectorLogical = new G4LogicalVolume(detectorSolid, fDetectorMaterial, "detectorLogical");
 
-  new G4PVPlacement(0, G4ThreeVector(0., 0., -1.5 * m), fdetectorLogical, "detectorPhysical", apparatusLogical, false, 0, checkOverlaps);
+  new G4PVPlacement(0, G4ThreeVector(0., 0., -1.5 * m), fDetectorLogical, "detectorPhysical", apparatusLogical, false, 0, checkOverlaps);
 
 
   // FIXME -- surfaces added here, from OpNoviceDetectorCtor
+
+
 
   // **********************************************************************
   // **********************************************************************
@@ -105,7 +109,7 @@ G4VPhysicalVolume *DetectorConstruction::Construct()
   fVisAttributes.push_back(visAttributes);
 
   visAttributes = new G4VisAttributes(G4Colour(0.8888, 0.0, 0.0));
-  fdetectorLogical->SetVisAttributes(visAttributes);
+  fDetectorLogical->SetVisAttributes(visAttributes);
   fVisAttributes.push_back(visAttributes);
 
   visAttributes = new G4VisAttributes(G4Colour(0.8888, 0.8888, 0.0));
@@ -139,9 +143,9 @@ void DetectorConstruction::ConstructMaterials() {
   // Water
   auto H = new G4Element("Hydrogen", "H", z = 1, a = 1.01 * g / mole);
   auto O = new G4Element("Oxygen", "O", z = 8, a = 16.00 * g / mole);
-  fdetectorMaterial = new G4Material("Water", density = 1.0 * g / cm3, nelements = 2);
-  fdetectorMaterial->AddElement(H, 2);
-  fdetectorMaterial->AddElement(O, 1);
+  fDetectorMaterial = new G4Material("Water", density = 1.0 * g / cm3, nelements = 2);
+  fDetectorMaterial->AddElement(H, 2);
+  fDetectorMaterial->AddElement(O, 1);
 
   fmpt = new G4MaterialPropertiesTable();
 
@@ -184,10 +188,10 @@ void DetectorConstruction::ConstructMaterials() {
   // G4cout << "Water G4MaterialPropertiesTable:" << G4endl;
   // fmpt->DumpTable();
 
-  fdetectorMaterial->SetMaterialPropertiesTable(fmpt);
+  fDetectorMaterial->SetMaterialPropertiesTable(fmpt);
 
   // Set the Birks Constant for the Water scintillator
-  fdetectorMaterial->GetIonisation()->SetBirksConstant(0.126 * mm / MeV);
+  fDetectorMaterial->GetIonisation()->SetBirksConstant(0.126 * mm / MeV);
 
 }
 
