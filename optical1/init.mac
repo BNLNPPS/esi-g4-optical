@@ -2,6 +2,6 @@
 # when running in interactive mode without visualization
 #
 # Set some default verbose
-/control/verbose 1
+/control/verbose 0
 /control/saveHistory
-/run/verbose 1
+/run/verbose 0

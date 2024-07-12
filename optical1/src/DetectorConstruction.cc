@@ -33,7 +33,7 @@
 DetectorConstruction::DetectorConstruction() : G4VUserDetectorConstruction(),
                                                fDetectorLogical(0),
                                                fDetectorMaterial(0),
-                                               fDetectorSurface(0),
+                                               fDetectorOpSurface(0),
                                                fmpt(0),
                                                fVisAttributes()
 {
@@ -65,21 +65,23 @@ G4VPhysicalVolume *DetectorConstruction::Construct()
 
   G4bool checkOverlaps = true;
 
-  // **********************************************************************
-  // **********************************************************************
-  // **********************************************************************
-  // We'll build the world, the apparatus and finally our optical detector
 
-  G4VSolid *worldSolid = new G4Box("worldBox", 5. * m, 5. * m, 5. * m);
+  // **********************************************************************
+  //
+  // We'll build
+  //      - the world
+  //      - the apparatus
+  //      - the optical detector
 
-  G4LogicalVolume *worldLogical = new G4LogicalVolume(worldSolid, air, "worldLogical");
-  G4VPhysicalVolume *worldPhysical = new G4PVPlacement(0, G4ThreeVector(), worldLogical, "worldPhysical", 0, false, 0, checkOverlaps);
+  G4VSolid *worldSolid              = new G4Box("worldBox", 10.*m, 10.*m, 10.*m);
+  G4LogicalVolume *worldLogical     = new G4LogicalVolume(worldSolid, air, "worldLogical");
+  G4VPhysicalVolume *worldPhysical  = new G4PVPlacement(0, G4ThreeVector(), worldLogical, "worldPhysical", 0, false, 0, checkOverlaps);
 
   // The apparatus
-  G4VSolid *apparatusSolid = new G4Box("apparatusBox", .5 * m, .5 * m, .5 * m);
+  G4VSolid *apparatusSolid          = new G4Box("apparatusBox", 5.*m, 5.*m, 5.*m);
   G4LogicalVolume *apparatusLogical = new G4LogicalVolume(apparatusSolid, air, "apparatusLogical");
 
-  new G4PVPlacement(0, G4ThreeVector(0., 0., -5. * m), apparatusLogical, "apparatusPhysical", worldLogical, false, 0, checkOverlaps);
+  new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), apparatusLogical, "apparatusPhysical", worldLogical, false, 0, checkOverlaps);
 
   // Detector
   G4VSolid *detectorSolid = new G4Box("detectorBox", 10. * cm, 10. * cm, 10. * cm);
@@ -90,6 +92,10 @@ G4VPhysicalVolume *DetectorConstruction::Construct()
 
   // FIXME -- surfaces added here, from OpNoviceDetectorCtor
 
+  fDetectorOpSurface = new G4OpticalSurface("WaterSurface");
+  fDetectorOpSurface->SetType(dielectric_LUTDAVIS);
+  fDetectorOpSurface->SetFinish(Rough_LUT);
+  fDetectorOpSurface->SetModel(DAVIS);
 
 
   // **********************************************************************
@@ -141,8 +147,8 @@ void DetectorConstruction::ConstructMaterials() {
 
   // -mxp- This is from OpNovice
   // Water
-  auto H = new G4Element("Hydrogen", "H", z = 1, a = 1.01 * g / mole);
-  auto O = new G4Element("Oxygen", "O", z = 8, a = 16.00 * g / mole);
+  auto H = new G4Element("Hydrogen",  "H", z = 1, a = 1.01 * g  / mole);
+  auto O = new G4Element("Oxygen",    "O", z = 8, a = 16.00 * g / mole);
   fDetectorMaterial = new G4Material("Water", density = 1.0 * g / cm3, nelements = 2);
   fDetectorMaterial->AddElement(H, 2);
   fDetectorMaterial->AddElement(O, 1);
@@ -156,15 +162,12 @@ void DetectorConstruction::ConstructMaterials() {
   // to AddProperty.
   
 
-  // -mxp- this original code throws a warning exception,
-  // but apparently you need to "init" a property first. Hmm.
+  // -mxp- this original code throws a warning exception, but apparently you need to "init" a property first.
   G4int numEntries = 1;
   fmpt->AddProperty("RINDEX", &photonEnergy[0], &refractiveIndex1[0], numEntries);
 
 
-  for(size_t i = 1; i < photonEnergy.size(); ++i) {
-    fmpt->AddEntry("RINDEX", photonEnergy[i], refractiveIndex1[i]);
-  }
+  for(size_t i = 1; i < photonEnergy.size(); ++i) {fmpt->AddEntry("RINDEX", photonEnergy[i], refractiveIndex1[i]);}
 
 
   // Check that group velocity is calculated from RINDEX
@@ -183,8 +186,8 @@ void DetectorConstruction::ConstructMaterials() {
   fmpt->AddConstProperty("MIEHG_FORWARD_RATIO", mie_water_const[2]);
 
 
-  G4cout << *(G4Material::GetMaterialTable()) << G4endl;
-
+  // FIXME Better make a flag to print the necessary info instead of comment/uncomment
+  // G4cout << *(G4Material::GetMaterialTable()) << G4endl;
   // G4cout << "Water G4MaterialPropertiesTable:" << G4endl;
   // fmpt->DumpTable();
 

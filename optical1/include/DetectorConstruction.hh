@@ -9,6 +9,9 @@
 #include "G4Material.hh"
 
 #include "G4OpticalSurface.hh"
+#include "G4LogicalBorderSurface.hh"
+// #include "G4LogicalSkinSurface.hh"
+
 #include "G4RotationMatrix.hh"
 #include "G4FieldManager.hh"
 
@@ -48,7 +51,7 @@ private:
     OpticalMessenger*   fMessenger;
     G4LogicalVolume*    fDetectorLogical;
     G4Material*         fDetectorMaterial;
-    G4OpticalSurface*   fDetectorSurface;
+    G4OpticalSurface*   fDetectorOpSurface;
 
 
     G4MaterialPropertiesTable* fmpt;
