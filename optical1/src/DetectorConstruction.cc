@@ -78,7 +78,7 @@ G4VPhysicalVolume *DetectorConstruction::Construct()
   G4VPhysicalVolume *worldPhysical  = new G4PVPlacement(0, G4ThreeVector(), worldLogical, "worldPhysical", 0, false, 0, checkOverlaps);
 
   // The apparatus
-  G4VSolid *apparatusSolid          = new G4Box("apparatusBox", 5.*m, 5.*m, 5.*m);
+  G4VSolid *apparatusSolid          = new G4Box("apparatusBox", 9.*m, 9.*m, 9.*m);
   G4LogicalVolume *apparatusLogical = new G4LogicalVolume(apparatusSolid, air, "apparatusLogical");
 
   new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), apparatusLogical, "apparatusPhysical", worldLogical, false, 0, checkOverlaps);
@@ -87,7 +87,7 @@ G4VPhysicalVolume *DetectorConstruction::Construct()
   G4VSolid *detectorSolid = new G4Box("detectorBox", 10. * cm, 10. * cm, 10. * cm);
   fDetectorLogical = new G4LogicalVolume(detectorSolid, fDetectorMaterial, "detectorLogical");
 
-  new G4PVPlacement(0, G4ThreeVector(0., 0., -1.5 * m), fDetectorLogical, "detectorPhysical", apparatusLogical, false, 0, checkOverlaps);
+  new G4PVPlacement(0, G4ThreeVector(0., 0., 0. * m), fDetectorLogical, "detectorPhysical", apparatusLogical, false, 0, checkOverlaps);
 
 
   // FIXME -- surfaces added here, from OpNoviceDetectorCtor

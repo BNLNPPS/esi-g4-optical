@@ -10,10 +10,9 @@
 
 // ---
 
-PrimaryGeneratorAction::PrimaryGeneratorAction()
-: G4VUserPrimaryGeneratorAction(),     
+PrimaryGeneratorAction::PrimaryGeneratorAction(): G4VUserPrimaryGeneratorAction(),     
   fParticleGun(0), fMessenger(0), 
-  fPositron(0), fMuon(0), fPion(0), fKaon(0), fProton(0),
+  fPositron(0), fElectron(0), fMuon(0), fPion(0), fKaon(0), fProton(0),
   fMomentum(1000.*MeV),
   fSigmaMomentum(50.*MeV),
   fSigmaAngle(2.*deg),
@@ -24,14 +23,15 @@ PrimaryGeneratorAction::PrimaryGeneratorAction()
     
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
     G4String particleName;
-    fPositron = particleTable->FindParticle(particleName="e+");
-    fMuon = particleTable->FindParticle(particleName="mu+");
-    fPion = particleTable->FindParticle(particleName="pi+");
-    fKaon = particleTable->FindParticle(particleName="kaon+");
-    fProton = particleTable->FindParticle(particleName="proton");
+    fElectron   = particleTable->FindParticle(particleName="e-");
+    fPositron   = particleTable->FindParticle(particleName="e+");
+    fMuon       = particleTable->FindParticle(particleName="mu+");
+    fPion       = particleTable->FindParticle(particleName="pi+");
+    fKaon       = particleTable->FindParticle(particleName="kaon+");
+    fProton     = particleTable->FindParticle(particleName="proton");
     
     // default particle kinematics
-    fParticleGun->SetParticlePosition(G4ThreeVector(0.,0.,-8.*m));
+    fParticleGun->SetParticlePosition(G4ThreeVector(0.,0.,-10.*cm));
     fParticleGun->SetParticleDefinition(fProton);
     
     // define commands for this class

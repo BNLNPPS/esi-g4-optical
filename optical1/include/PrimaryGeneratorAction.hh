@@ -71,8 +71,10 @@ public:
 private:
     void DefineCommands();
 
-    G4ParticleGun* fParticleGun;
-    G4GenericMessenger* fMessenger;
+    G4ParticleGun*        fParticleGun;
+    G4GenericMessenger*   fMessenger;
+
+    G4ParticleDefinition* fElectron;    
     G4ParticleDefinition* fPositron;
     G4ParticleDefinition* fMuon;
     G4ParticleDefinition* fPion;
