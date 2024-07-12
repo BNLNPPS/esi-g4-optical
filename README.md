@@ -1,4 +1,4 @@
-# ESI Optical Testbed
+# The ESI Optical Testbed
 
 ## About
 
