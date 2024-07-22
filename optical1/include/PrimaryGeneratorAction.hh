@@ -34,7 +34,9 @@
 #include "G4VUserPrimaryGeneratorAction.hh"
 #include "globals.hh"
 
-class G4ParticleGun;
+
+#include "G4ParticleGun.hh"
+// class G4ParticleGun;
 class G4GenericMessenger;
 class G4Event;
 class G4ParticleDefinition;
@@ -67,7 +69,9 @@ public:
 
     void SetRandomize(G4bool val) { fRandomizePrimary = val; }
     G4bool GetRandomize() const { return fRandomizePrimary; }
-    
+
+    G4ParticleGun* GetParticleGun() { return fParticleGun; }
+
 private:
     void DefineCommands();
 
