@@ -21,3 +21,10 @@ make
 # you can use the -j option to make it work quicked, e.g.
 make -j8
 ```
+
+## OpenGL under WSL2
+
+To get graphics working when running under WSL2, it may be necessary to apply this setting:
+```bash
+export LIBGL_ALWAYS_INDIRECT=
+```
