@@ -28,3 +28,23 @@ To get graphics working when running under WSL2, it may be necessary to apply th
 ```bash
 export LIBGL_ALWAYS_INDIRECT=
 ```
+
+## Outline of the Geant logic and workflow
+
+### Main
+
+* Create the _G4UIExecutive_ and the _runManager_
+* Initialize the _runManager_ with the _DetectorConstruction_
+* Create the _physicsList_ which includes optical physics
+* Call _ActionInitialization_
+
+### PrimaryGeneratorAction
+
+This is created in the "Build" method of _ActionInitialization_. Various particle generation
+parameters are stored here, as well as a reference to the _ParticleGun_.
+
+### RunAction
+
+Generates the "Run" object, and calls "EndOfRun" in the end.
+
+
