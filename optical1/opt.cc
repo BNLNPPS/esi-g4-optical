@@ -21,10 +21,8 @@ int main(int argc, char **argv)
 {
 
   bool verbose        =   false;
-  bool cimode         =   false;
   bool help           =   false;
   std::string mac_name = "vis.mac";
-  size_t taps_start   = 4;
    
   auto cli = lyra::cli()
       | lyra::opt(verbose)
