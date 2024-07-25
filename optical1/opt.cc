@@ -12,10 +12,31 @@
 #include "G4VisExecutive.hh"
 #include "G4UIExecutive.hh"
 
-// ---
+
+// CLI aruments handling:
+#include "lyra.hpp"
+
 
 int main(int argc, char **argv)
 {
+
+  bool verbose        =   false;
+  bool cimode         =   false;
+  bool help           =   false;
+  std::string mac_name = "vis.mac";
+  size_t taps_start   = 4;
+   
+  auto cli = lyra::cli()
+      | lyra::opt(verbose)
+        ["-v"]["--verbose"]("bool - verbose mode" )
+      | lyra::help(help)
+      | lyra::opt(mac_name, "mac_name")
+        ["-m"]["--mac_name"]("taps_start: default 4, starting point for tap scan")
+    ;
+
+  auto result = cli.parse({ argc, argv });
+
+
   // Detect interactive mode (if no argument) and define UI session
   G4UIExecutive *ui = 0;
   if (argc == 1)
@@ -60,7 +81,7 @@ int main(int argc, char **argv)
   {
     // execute an argument macro file if exist
     G4String command = "/control/execute ";
-    G4String fileName = argv[1];
+    G4String fileName = mac_name;
     UImanager->ApplyCommand(command + fileName);
   }
   else
