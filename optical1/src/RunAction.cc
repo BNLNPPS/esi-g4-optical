@@ -16,21 +16,8 @@ RunAction::RunAction(PrimaryGeneratorAction* prim, std::string OutPutFormat)
 {
 _OutPutFormat = OutPutFormat;
 
-
 auto analysisManager = G4AnalysisManager::Instance(); //get the manager
-std::string runnumber = std::to_string( int(1000000*(1+G4UniformRand())) );
-
-if(_OutPutFormat == "root"){
-    fileName = "Run" + runnumber + ".root"; //select root format
-    }
-else if(_OutPutFormat == "csv")
-{fileName = "Run" + runnumber + ".csv";}
-else if(_OutPutFormat == "hdf5")
-{fileName = "Run" + runnumber + ".hdf5";}
-
-
-
-analysisManager->OpenFile(fileName);
+analysisManager->SetNtupleMerging(true);
 analysisManager->CreateNtuple("Ntuple", "Ntuple");
 analysisManager->CreateNtupleDColumn("Energy");
 analysisManager->CreateNtupleDColumn("X");
@@ -44,11 +31,6 @@ analysisManager->FinishNtuple();
 
 
 RunAction::~RunAction(){
-
-  auto analysisManager = G4AnalysisManager::Instance();
-  // Write and close file
-  analysisManager->Write();
-  analysisManager->CloseFile();
 }
 
 // ---
@@ -61,18 +43,41 @@ G4Run* RunAction::GenerateRun()
 // ---
 void RunAction::BeginOfRunAction(const G4Run*)
 {
+
+
+  auto analysisManager = G4AnalysisManager::Instance(); //get the manager
+
+  if(_OutPutFormat == "root"){
+    fileName = "Run.root"; //select root format
+    }
+  else if(_OutPutFormat == "csv")
+  {fileName = "Run.csv";}
+  else if(_OutPutFormat == "hdf5")
+  {fileName = "Run.hdf5";}
+  analysisManager->OpenFile(fileName);
+  
+  
   if(fPrimary)
-  {
+    {
     G4ParticleDefinition* particle =
       fPrimary->GetParticleGun()->GetParticleDefinition();
     G4double energy = fPrimary->GetParticleGun()->GetParticleEnergy();
     fRun->SetPrimary(particle, energy);
-  }
+    }
 }
 
 // ---
 void RunAction::EndOfRunAction(const G4Run*)
 {
-  if(isMaster)
+
+auto analysisManager = G4AnalysisManager::Instance();
+  if(isMaster){
     fRun->EndOfRun();
+    }
+
+  // Write and close file
+  analysisManager->Write();
+  analysisManager->CloseFile();
+  
+
 }
