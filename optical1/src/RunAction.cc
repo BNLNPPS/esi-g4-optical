@@ -4,31 +4,51 @@
 #include "G4ParticleDefinition.hh"
 #include "G4Run.hh"
 #include <string>
-#include <mutex>
 #include <fstream>
-std::mutex photonDataMutex;
+#include "Randomize.hh"
+#include "G4AnalysisManager.hh"
 
 // ---
-RunAction::RunAction(PrimaryGeneratorAction* prim)
+RunAction::RunAction(PrimaryGeneratorAction* prim, std::string OutPutFormat)
   : G4UserRunAction()
   , fRun(nullptr)
   , fPrimary(prim)
-{printOutBufferSize = 1000;}
+{
+_OutPutFormat = OutPutFormat;
+
+
+auto analysisManager = G4AnalysisManager::Instance(); //get the manager
+std::string runnumber = std::to_string( int(1000000*(1+G4UniformRand())) );
+
+if(_OutPutFormat == "root"){
+    fileName = "Run" + runnumber + ".root"; //select root format
+    }
+else if(_OutPutFormat == "csv")
+{fileName = "Run" + runnumber + ".csv";}
+else if(_OutPutFormat == "hdf5")
+{fileName = "Run" + runnumber + ".hdf5";}
 
 
 
+analysisManager->OpenFile(fileName);
+analysisManager->CreateNtuple("Ntuple", "Ntuple");
+analysisManager->CreateNtupleDColumn("Energy");
+analysisManager->CreateNtupleDColumn("X");
+analysisManager->CreateNtupleDColumn("Y");
+analysisManager->CreateNtupleDColumn("Z");
+analysisManager->CreateNtupleDColumn("Dir_X");
+analysisManager->CreateNtupleDColumn("Dir_Y");
+analysisManager->CreateNtupleDColumn("Dir_Z");
+analysisManager->FinishNtuple();
+}
 
 
 RunAction::~RunAction(){
-    std::fstream CerenkovFile(std::string("CerenkovPhotons")+
-		std::to_string(G4Threading::G4GetThreadId())+".dat", std::ios_base::app);
-		for (const auto& event : PhotonData) {
-        for (int k=1; k<event.size(); ++k) 
-              CerenkovFile << " " << event.at(k);
-			CerenkovFile << G4endl;
-		}
-    PhotonData.clear();
-		CerenkovFile.close();
+
+  auto analysisManager = G4AnalysisManager::Instance();
+  // Write and close file
+  analysisManager->Write();
+  analysisManager->CloseFile();
 }
 
 // ---
@@ -55,25 +75,4 @@ void RunAction::EndOfRunAction(const G4Run*)
 {
   if(isMaster)
     fRun->EndOfRun();
-}
-void RunAction::AddPhoton(std::vector<double> Photon){
-
- 
-  //std::lock_guard<std::mutex> lock(photonDataMutex);
- PhotonData.push_back(Photon);
-
- if (PhotonData.size() == printOutBufferSize){
-
-    std::fstream CerenkovFile(std::string("CerenkovPhotons")+
-		std::to_string(G4Threading::G4GetThreadId())+".dat", std::ios_base::app);
-		for (const auto& event : PhotonData) {
-        for (int k=1; k<event.size(); ++k) 
-              CerenkovFile << " " << event.at(k);
-			CerenkovFile << G4endl;
-		}
-    PhotonData.clear();
-		CerenkovFile.close();
-
-    }
- 
 }

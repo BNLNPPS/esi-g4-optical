@@ -23,6 +23,7 @@ int main(int argc, char **argv)
   bool verbose        =   false;
   bool help           =   false;
   std::string mac_name = "vis.mac";
+  std::string output_format = "csv";
    
   auto cli = lyra::cli()
       | lyra::opt(verbose)
@@ -30,6 +31,9 @@ int main(int argc, char **argv)
       | lyra::help(help)
       | lyra::opt(mac_name, "mac_name")
         ["-m"]["--mac_name"]("taps_start: default 4, starting point for tap scan")
+      | lyra::opt(output_format, "output_format")
+        ["-f"]["--output_format"]("taps_start: default 4, starting point for tap scan")
+
     ;
 
   auto result = cli.parse({ argc, argv });
@@ -62,7 +66,7 @@ int main(int argc, char **argv)
   runManager->SetUserInitialization(physicsList);
 
   // User action initialization
-  runManager->SetUserInitialization(new ActionInitialization());
+  runManager->SetUserInitialization(new ActionInitialization(output_format));
 
   // Visualization manager construction
   // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
