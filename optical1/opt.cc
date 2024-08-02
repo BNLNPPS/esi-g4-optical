@@ -20,31 +20,28 @@
 int main(int argc, char **argv)
 {
 
-  bool verbose        =   false;
   bool help           =   false;
-  std::string mac_name = "vis.mac";
+  std::string mac_name = "init_vis.mac";
   std::string output_format = "csv";
    
   auto cli = lyra::cli()
-      | lyra::opt(verbose)
-        ["-v"]["--verbose"]("bool - verbose mode" )
       | lyra::help(help)
       | lyra::opt(mac_name, "mac_name")
-        ["-m"]["--mac_name"]("taps_start: default 4, starting point for tap scan")
+        ["-m"]["--mac_name"]("mac_name: default: init_vis.mac, otherwise specify the name of the G4 macro file to be run")
       | lyra::opt(output_format, "output_format")
-        ["-f"]["--output_format"]("taps_start: default 4, starting point for tap scan")
-
+        ["-f"]["--output_format"]("default: csv, options: csv, root, hdf5")
     ;
 
   auto result = cli.parse({ argc, argv });
 
 
+  if(help) {
+    std::cout << cli << std::endl;
+    exit(0);
+  }
+
   // Detect interactive mode (if no argument) and define UI session
   G4UIExecutive *ui = 0;
-  if (argc == 1)
-  { // No commands line argument, G4UIExecutive will guess what is the best available UI
-    ui = new G4UIExecutive(argc, argv);
-  }
 
   // Construct the default run manager
   auto *runManager = G4RunManagerFactory::CreateRunManager();
@@ -74,29 +71,32 @@ int main(int argc, char **argv)
   G4VisManager *visManager = new G4VisExecutive("Quiet");
   visManager->Initialize();
 
+  if(argc != 1 && mac_name == "init_vis.mac") 
+      {
+      G4cerr << "   *****************************************" <<  G4endl;
+      G4cerr << "Macro file must be specified if the executable is not called without arguments!" <<  G4endl;
+      G4cerr << "   *****************************************" <<  G4endl;
+      exit(-1);
+      }
 
-  // Around L166 in OpNovicw
+
+  if(argc == 1) ui = new G4UIExecutive(argc, argv);
+
   // Get the pointer to the User Interface manager
   G4UImanager *UImanager = G4UImanager::GetUIpointer();
-
-  if (argc > 1)
-  {
-    // execute an argument macro file if exist
-    G4String command = "/control/execute ";
-    G4String fileName = mac_name;
-    UImanager->ApplyCommand(command + fileName);
-  }
-  else
-  {
-    // We have visualization, initialize defaults: look in init_vis.mac macro
-    UImanager->ApplyCommand("/control/execute init_vis.mac");
-    if (ui->IsGUI())
+  G4String fileName = mac_name;
+  G4String command = "/control/execute ";
+  UImanager->ApplyCommand(command + fileName);
+  
+  if (argc == 1) 
     {
       UImanager->ApplyCommand("/control/execute gui.mac");
+      ui->SessionStart();
+      delete ui;
     }
-    ui->SessionStart();
-    delete ui;
-  }
+
+
+
   // Job termination
   // Free the store: user actions, physics_list and detector_description are
   // owned and deleted by the run manager, so they should not be deleted in the main() program !
