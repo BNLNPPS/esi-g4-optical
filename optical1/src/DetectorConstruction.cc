@@ -28,6 +28,12 @@
 
 #include "mpt.hh"
 
+
+// CADMESH //
+
+
+//#include "CADMesh.hh"
+
 //---
 
 DetectorConstruction::DetectorConstruction() : G4VUserDetectorConstruction(),
@@ -84,11 +90,21 @@ G4VPhysicalVolume *DetectorConstruction::Construct()
   new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), apparatusLogical, "apparatusPhysical", worldLogical, false, 0, checkOverlaps);
 
   // Detector
+  
   G4VSolid *detectorSolid = new G4Box("detectorBox", 10. * cm, 10. * cm, 10. * cm);
   fDetectorLogical = new G4LogicalVolume(detectorSolid, fDetectorMaterial, "detectorLogical");
-
   new G4PVPlacement(0, G4ThreeVector(0., 0., 0. * m), fDetectorLogical, "detectorPhysical", apparatusLogical, false, 0, checkOverlaps);
 
+
+  // CAD example
+
+  /*
+  std::string cadfile = "../cad/example.stl";
+  CADMesh *mesh = new CADMesh((char*)cadfile.c_str(), mm, G4ThreeVector(), false);
+  G4VSolid* cad_example_solid = mesh->TessellatedMesh();
+  G4LogicalVolume* cad_example_logic = new G4LogicalVolume(cad_example_solid, fDetectorMaterial, "cad_example_log", 0, 0, 0);
+  new G4PVPlacement(0, G4ThreeVector(0., 0., 0. * m), cad_example_logic, "cad_example_phys", fDetectorLogical, false, 0, checkOverlaps);
+  */
 
   // FIXME -- surfaces added here, from OpNoviceDetectorCtor
 

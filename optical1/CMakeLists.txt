@@ -15,11 +15,17 @@ else()
   find_package(Geant4 REQUIRED)
 endif()
 
+
 #----------------------------------------------------------------------------
 # Setup Geant4 include directories and compile definitions
 # Setup include directory for this project
 #
 include(${Geant4_USE_FILE})
+
+
+#Cadmash
+#
+find_package(cadmesh)
 
 #----------------------------------------------------------------------------
 # Locate sources and headers for this project
@@ -35,6 +41,9 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 #
 add_executable(Opt opt.cc ${sources} ${headers})
 target_link_libraries(Opt ${Geant4_LIBRARIES})
+target_link_libraries(Opt ${cadmesh_LIBRARIES} )
+
+link_directories(${Geant4_LIBRARY_DIR} ${cadmesh_LIBRARY_DIRS})
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we

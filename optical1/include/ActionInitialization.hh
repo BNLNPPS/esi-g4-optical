@@ -2,13 +2,13 @@
 #define ActionInitialization_h 1
 
 #include "G4VUserActionInitialization.hh"
-
+#include <string>
 /// Action initialization class.
 
 class ActionInitialization : public G4VUserActionInitialization
 {
   public:
-    ActionInitialization();
+    ActionInitialization(std:: string);
     virtual ~ActionInitialization();
 
     //This is called by the master thread.
@@ -20,6 +20,8 @@ class ActionInitialization : public G4VUserActionInitialization
     //Create here the user-actions needed by each thread:
     // RunAction, EventAction, SteppingAction, StackingAction
     virtual void Build() const;
+  private:
+    std:: string _OutputFormat;
 
 };
 
