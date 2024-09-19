@@ -24,6 +24,8 @@ int main(int argc, char **argv)
   std::string mac_name = "init_vis.mac";
   std::string output_format = "csv";
    
+
+  // We use lyra to parse the command line:
   auto cli = lyra::cli()
       | lyra::help(help)
       | lyra::opt(mac_name, "mac_name")
@@ -34,12 +36,14 @@ int main(int argc, char **argv)
 
   auto result = cli.parse({ argc, argv });
 
-
+  // Optionally, print help and exit:
   if(help) {
     std::cout << cli << std::endl;
     exit(0);
   }
 
+
+  // --------------------------------------------------------------
   // Detect interactive mode (if no argument) and define UI session
   G4UIExecutive *ui = 0;
 
@@ -48,8 +52,7 @@ int main(int argc, char **argv)
   runManager->SetUserInitialization(new DetectorConstruction);
   runManager->SetVerboseLevel(0);
 
-  // The Physics --
-  //  Cf L158 extended/opticall/OpNovice.cc 11.2.1
+  // The Physics... Cf. L158 extended/opticall/OpNovice.cc 11.2.1
   G4VModularPhysicsList *physicsList = new FTFP_BERT(0);
 
   // Original
@@ -58,8 +61,10 @@ int main(int argc, char **argv)
   // Replace with Optics
 
   physicsList->ReplacePhysics(new G4EmStandardPhysics_option4());
+
   auto opticalPhysics = new G4OpticalPhysics();
   physicsList->RegisterPhysics(opticalPhysics);
+  
   runManager->SetUserInitialization(physicsList);
 
   // User action initialization

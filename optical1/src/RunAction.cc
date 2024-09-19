@@ -6,6 +6,7 @@
 #include <string>
 #include <fstream>
 #include "Randomize.hh"
+
 #include "G4AnalysisManager.hh"
 
 // ---
@@ -47,33 +48,26 @@ void RunAction::BeginOfRunAction(const G4Run*)
 
   auto analysisManager = G4AnalysisManager::Instance(); //get the manager
 
-  if(_OutPutFormat == "root"){
-    fileName = "Run.root"; //select root format
-    }
-  else if(_OutPutFormat == "csv")
-  {fileName = "Run.csv";}
-  else if(_OutPutFormat == "hdf5")
-  {fileName = "Run.hdf5";}
+  if      (_OutPutFormat == "root")  { fileName = "Run.root";  }
+  else if (_OutPutFormat == "csv")   { fileName = "Run.csv";   }
+  else if (_OutPutFormat == "hdf5")  { fileName = "Run.hdf5";  }
+
   analysisManager->OpenFile(fileName);
   
   
-  if(fPrimary)
-    {
-    G4ParticleDefinition* particle =
-      fPrimary->GetParticleGun()->GetParticleDefinition();
-    G4double energy = fPrimary->GetParticleGun()->GetParticleEnergy();
+  if(fPrimary) {
+    G4ParticleDefinition* particle  = fPrimary->GetParticleGun()->GetParticleDefinition();
+    G4double energy                 = fPrimary->GetParticleGun()->GetParticleEnergy();
+    
     fRun->SetPrimary(particle, energy);
-    }
+  }
 }
 
 // ---
-void RunAction::EndOfRunAction(const G4Run*)
-{
+void RunAction::EndOfRunAction(const G4Run*) {
 
-auto analysisManager = G4AnalysisManager::Instance();
-  if(isMaster){
-    fRun->EndOfRun();
-    }
+  auto analysisManager = G4AnalysisManager::Instance();
+  if(isMaster) {fRun->EndOfRun();}
 
   // Write and close file
   analysisManager->Write();
