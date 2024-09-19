@@ -10,49 +10,49 @@
 #include "G4AnalysisManager.hh"
 
 // ---
-RunAction::RunAction(PrimaryGeneratorAction* prim, std::string OutPutFormat)
-  : G4UserRunAction()
-  , fRun(nullptr)
-  , fPrimary(prim)
-{
-_OutPutFormat = OutPutFormat;
+RunAction::RunAction(PrimaryGeneratorAction* prim, std::string OutPutFormat): G4UserRunAction(), fRun(nullptr), fPrimary(prim) {
+  _OutPutFormat = OutPutFormat;
 
-auto analysisManager = G4AnalysisManager::Instance(); //get the manager
-analysisManager->SetNtupleMerging(true);
-analysisManager->CreateNtuple("Ntuple", "Ntuple");
-analysisManager->CreateNtupleDColumn("Energy");
-analysisManager->CreateNtupleDColumn("X");
-analysisManager->CreateNtupleDColumn("Y");
-analysisManager->CreateNtupleDColumn("Z");
-analysisManager->CreateNtupleDColumn("Dir_X");
-analysisManager->CreateNtupleDColumn("Dir_Y");
-analysisManager->CreateNtupleDColumn("Dir_Z");
-analysisManager->FinishNtuple();
+
+  if(_OutPutFormat!="") {
+
+    auto analysisManager = G4AnalysisManager::Instance(); //get the manager
+    analysisManager->SetNtupleMerging(true);
+
+    analysisManager->CreateNtuple("Ntuple", "Ntuple");
+    analysisManager->CreateNtupleDColumn("Energy");
+    analysisManager->CreateNtupleDColumn("X");
+    analysisManager->CreateNtupleDColumn("Y");
+    analysisManager->CreateNtupleDColumn("Z");
+    analysisManager->CreateNtupleDColumn("Dir_X");
+    analysisManager->CreateNtupleDColumn("Dir_Y");
+    analysisManager->CreateNtupleDColumn("Dir_Z");
+    analysisManager->FinishNtuple();
+  }
 }
 
 
-RunAction::~RunAction(){
-}
+RunAction::~RunAction(){}
 
 // ---
-G4Run* RunAction::GenerateRun()
-{
+G4Run* RunAction::GenerateRun() {
   fRun = new Run();
   return fRun;
 }
 
 // ---
-void RunAction::BeginOfRunAction(const G4Run*)
-{
+void RunAction::BeginOfRunAction(const G4Run*) {
 
 
   auto analysisManager = G4AnalysisManager::Instance(); //get the manager
+
+  fileName = "";
 
   if      (_OutPutFormat == "root")  { fileName = "Run.root";  }
   else if (_OutPutFormat == "csv")   { fileName = "Run.csv";   }
   else if (_OutPutFormat == "hdf5")  { fileName = "Run.hdf5";  }
 
-  analysisManager->OpenFile(fileName);
+  if (_OutPutFormat!="") {analysisManager->OpenFile(fileName);}
   
   
   if(fPrimary) {
@@ -70,8 +70,10 @@ void RunAction::EndOfRunAction(const G4Run*) {
   if(isMaster) {fRun->EndOfRun();}
 
   // Write and close file
-  analysisManager->Write();
-  analysisManager->CloseFile();
+  if (_OutPutFormat!="") {
+    analysisManager->Write();
+    analysisManager->CloseFile();
+  }
   
 
 }

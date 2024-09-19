@@ -37,16 +37,17 @@ void SteppingAction::UserSteppingAction(const G4Step* step) {
             double energy = step->GetPostStepPoint()->GetKineticEnergy();
 
             auto analysisManager = G4AnalysisManager::Instance();
-
-            //Fill the NTuple
-            analysisManager->FillNtupleDColumn(0, energy);
-            analysisManager->FillNtupleDColumn(1, x);
-            analysisManager->FillNtupleDColumn(2, y);
-            analysisManager->FillNtupleDColumn(3, z);
-            analysisManager->FillNtupleDColumn(4, x_dir);
-            analysisManager->FillNtupleDColumn(5, y_dir);
-            analysisManager->FillNtupleDColumn(6, z_dir);
-            analysisManager->AddNtupleRow();
+            if(analysisManager->IsOpenFile()) {
+                //Fill the NTuple
+                analysisManager->FillNtupleDColumn(0, energy);
+                analysisManager->FillNtupleDColumn(1, x);
+                analysisManager->FillNtupleDColumn(2, y);
+                analysisManager->FillNtupleDColumn(3, z);
+                analysisManager->FillNtupleDColumn(4, x_dir);
+                analysisManager->FillNtupleDColumn(5, y_dir);
+                analysisManager->FillNtupleDColumn(6, z_dir);
+                analysisManager->AddNtupleRow();
+            }
 
             /*
             std::vector<double> Photon = {x, y, z, x_dir, y_dir, z_dir, energy};

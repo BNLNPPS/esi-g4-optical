@@ -22,7 +22,7 @@ int main(int argc, char **argv)
 
   bool help           =   false;
   std::string mac_name = "init_vis.mac";
-  std::string output_format = "csv";
+  std::string output_format = "";
    
 
   // We use lyra to parse the command line:
@@ -31,7 +31,7 @@ int main(int argc, char **argv)
       | lyra::opt(mac_name, "mac_name")
         ["-m"]["--mac_name"]("mac_name: default: init_vis.mac, otherwise specify the name of the G4 macro file to be run")
       | lyra::opt(output_format, "output_format")
-        ["-f"]["--output_format"]("default: csv, options: csv, root, hdf5")
+        ["-f"]["--output_format"]("default: '', options: csv, root, hdf5")
     ;
 
   auto result = cli.parse({ argc, argv });
