@@ -17,12 +17,17 @@ cd optical1
 mkdir build
 cmake -B build
 cd build/
-make
-# you can use the -j option to make it work quicked, e.g.
-make -j8
+make # or, you can use the multithreaded -j option to make it work quicker
+make -j8 
 ```
 
+The auxiliary header-only library `lyra.hpp` that is used for the CLI argument parsing is
+in the _include_ folder of the project.
+
 ## Running
+
+To run the application, the Geant4 environment needs to be properly set by
+using its setup scripts in the _bin_ folder of the respective installation.
 
 "./Opt -m run1.mac" then the run1.mac macro is called, otherwise "./Opt" visualizes the event.
 

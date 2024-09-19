@@ -29,10 +29,7 @@
 #include "mpt.hh"
 
 
-// CADMESH //
-
-
-//#include "CADMesh.hh"
+// optional: #include "CADMesh.hh"
 
 //---
 
@@ -48,8 +45,7 @@ DetectorConstruction::DetectorConstruction() : G4VUserDetectorConstruction(),
 
 //---
 
-DetectorConstruction::~DetectorConstruction()
-{
+DetectorConstruction::~DetectorConstruction() {
   delete fMessenger;
   for (G4int i = 0; i < G4int(fVisAttributes.size()); ++i)
   {
@@ -59,10 +55,7 @@ DetectorConstruction::~DetectorConstruction()
 
 // ---
 
-G4VPhysicalVolume *DetectorConstruction::Construct()
-{
-
-  
+G4VPhysicalVolume *DetectorConstruction::Construct() {
   // NB. This is an important method as custom materials with
   // their propterties are defined:
   ConstructMaterials();
