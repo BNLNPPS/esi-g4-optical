@@ -17,8 +17,7 @@
 #include "lyra.hpp"
 
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
 
   bool help           =   false;
   std::string mac_name = "init_vis.mac";
@@ -76,15 +75,15 @@ int main(int argc, char **argv)
   G4VisManager *visManager = new G4VisExecutive("Quiet");
   visManager->Initialize();
 
-  if(argc != 1 && mac_name == "init_vis.mac") 
-      {
-      G4cerr << "   *****************************************" <<  G4endl;
-      G4cerr << "Macro file must be specified if the executable is not called without arguments!" <<  G4endl;
-      G4cerr << "   *****************************************" <<  G4endl;
-      exit(-1);
-      }
+  // if(argc != 1 && mac_name == "init_vis.mac") {
+  //     G4cout  << argc << " : " << argv << G4endl;
+  //     G4cerr << "   *****************************************" <<  G4endl;
+  //     G4cerr << "Macro file must be specified if the executable is not called without arguments!" <<  G4endl;
+  //     G4cerr << "   *****************************************" <<  G4endl;
+  //     exit(-1);
+  //     }
 
-
+  argc = 1;
   if(argc == 1) ui = new G4UIExecutive(argc, argv);
 
   // Get the pointer to the User Interface manager
