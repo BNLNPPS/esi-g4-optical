@@ -14,7 +14,14 @@ ActionInitialization::ActionInitialization(std::string OutputFormat):G4VUserActi
 ActionInitialization::~ActionInitialization() {}
 
 // ---
-void ActionInitialization::BuildForMaster() const {}
+void ActionInitialization::BuildForMaster() const {
+
+
+  RunAction* fRunAct = new RunAction(nullptr, _OutputFormat);
+  
+  SetUserAction(fRunAct);
+
+}
 
 
 // ---
