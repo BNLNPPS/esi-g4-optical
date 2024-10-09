@@ -11,18 +11,15 @@ using namespace B4;
 namespace B4b {
 
 // ---
-
 ActionInitialization::ActionInitialization(DetectorConstruction* detConstruction)
  : fDetConstruction(detConstruction) {}
 
 // ---
-
 void ActionInitialization::BuildForMaster() const {
   SetUserAction(new RunAction);
 }
 
 // ---
-
 void ActionInitialization::Build() const {
   SetUserAction(new PrimaryGeneratorAction);
   SetUserAction(new RunAction);
