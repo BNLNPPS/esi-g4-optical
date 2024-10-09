@@ -2,7 +2,7 @@
 # Setup the project
 #
 cmake_minimum_required(VERSION 3.16...3.27)
-project(B4b)
+project(Opt2)
 
 #----------------------------------------------------------------------------
 # Find Geant4 package, activating all available UI and Vis drivers by default
@@ -33,8 +33,8 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
 #
-add_executable(exampleB4b exampleB4b.cc ${sources} ${headers})
-target_link_libraries(exampleB4b ${Geant4_LIBRARIES})
+add_executable(Opt2 opt2.cc ${sources} ${headers})
+target_link_libraries(Opt2 ${Geant4_LIBRARIES})
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we
@@ -64,4 +64,4 @@ endforeach()
 #----------------------------------------------------------------------------
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
 #
-install(TARGETS exampleB4b DESTINATION bin)
+install(TARGETS Opt2 DESTINATION bin)

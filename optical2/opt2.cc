@@ -1,32 +1,3 @@
-//
-// ********************************************************************
-// * License and Disclaimer                                           *
-// *                                                                  *
-// * The  Geant4 software  is  copyright of the Copyright Holders  of *
-// * the Geant4 Collaboration.  It is provided  under  the terms  and *
-// * conditions of the Geant4 Software License,  included in the file *
-// * LICENSE and available at  http://cern.ch/geant4/license .  These *
-// * include a list of copyright holders.                             *
-// *                                                                  *
-// * Neither the authors of this software system, nor their employing *
-// * institutes,nor the agencies providing financial support for this *
-// * work  make  any representation or  warranty, express or implied, *
-// * regarding  this  software system or assume any liability for its *
-// * use.  Please see the license in the file  LICENSE  and URL above *
-// * for the full disclaimer and the limitation of liability.         *
-// *                                                                  *
-// * This  code  implementation is the result of  the  scientific and *
-// * technical work of the GEANT4 collaboration.                      *
-// * By using,  copying,  modifying or  distributing the software (or *
-// * any work based  on the software)  you  agree  to acknowledge its *
-// * use  in  resulting  scientific  publications,  and indicate your *
-// * acceptance of all terms of the Geant4 Software license.          *
-// ********************************************************************
-//
-//
-/// \file exampleB4b.cc
-/// \brief Main program of the B4b example
-
 #include "DetectorConstruction.hh"
 #include "ActionInitialization.hh"
 
@@ -39,7 +10,10 @@
 #include "FTFP_BERT.hh"
 #include "Randomize.hh"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+// CLI aruments handling:
+#include "lyra.hpp"
+
+// ---
 
 namespace {
   void PrintUsage() {
@@ -51,7 +25,7 @@ namespace {
   }
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+// ---
 
 int main(int argc,char** argv)
 {
@@ -62,10 +36,39 @@ int main(int argc,char** argv)
     return 1;
   }
 
+
+  // --mxp--
+  // We use lyra to parse the command line:
+
+  bool help                 =   false;
+  std::string mac_name      = "init_vis.mac";
+  std::string output_format = "";  
+
+  auto cli = lyra::cli()
+      | lyra::help(help)
+      | lyra::opt(mac_name, "mac_name")
+        ["-m"]["--mac_name"]("mac_name: default: init_vis.mac, otherwise specify the name of the G4 macro file to be run")
+      | lyra::opt(output_format, "output_format")
+        ["-f"]["--output_format"]("default: '', options: csv, root, hdf5")
+    ;
+
+  auto result = cli.parse({ argc, argv });
+
+  // Optionally, print help and exit:
+  if(help) {
+    std::cout << cli << std::endl;
+    exit(0);
+  }
+
+
+
   G4String macro;
   G4String session;
   G4bool verboseBestUnits = true;
 #ifdef G4MULTITHREADED
+
+  G4cout << "*********************************************************MT*********************************************************************" << G4endl;
+
   G4int nThreads = 0;
 #endif
   for ( G4int i=1; i<argc; i=i+2 ) {
@@ -103,9 +106,8 @@ int main(int argc,char** argv)
   }
 
   // Construct the default run manager
-  //
-  auto runManager =
-    G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
+  auto runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
+  runManager->SetVerboseLevel(0);
 #ifdef G4MULTITHREADED
   if ( nThreads > 0 ) {
     runManager->SetNumberOfThreads(nThreads);
@@ -123,8 +125,8 @@ int main(int argc,char** argv)
   auto actionInitialization = new B4b::ActionInitialization(detConstruction);
   runManager->SetUserInitialization(actionInitialization);
 
-  // Initialize visualization
-  auto visManager = new G4VisExecutive;
+  // Initialize visualization and make it quiet...
+  auto visManager = new G4VisExecutive("Quiet");
   // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
   // auto visManager = new G4VisExecutive("Quiet");
   visManager->Initialize();
@@ -158,4 +160,3 @@ int main(int argc,char** argv)
   delete runManager;
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....
