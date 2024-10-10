@@ -4,8 +4,6 @@
 #include "G4RunManager.hh"
 #include "G4UnitsTable.hh"
 
-namespace B4b {
-
 // ---
 void RunData::FillPerEvent() {
   auto analysisManager = G4AnalysisManager::Instance();
@@ -35,5 +33,3 @@ void RunData::Reset() {
   }
 }
 
-
-}

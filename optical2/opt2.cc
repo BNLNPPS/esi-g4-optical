@@ -122,7 +122,7 @@ int main(int argc,char** argv)
   auto physicsList = new FTFP_BERT;
   runManager->SetUserInitialization(physicsList);
 
-  auto actionInitialization = new B4b::ActionInitialization(detConstruction);
+  auto actionInitialization = new ActionInitialization(detConstruction);
   runManager->SetUserInitialization(actionInitialization);
 
   // Initialize visualization and make it quiet...

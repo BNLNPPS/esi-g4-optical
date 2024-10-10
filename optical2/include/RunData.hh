@@ -6,10 +6,7 @@
 
 #include <array>
 
-namespace B4b
-{
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+// ---
 
 const G4int kAbs = 0;
 const G4int kGap = 1;
@@ -28,8 +25,7 @@ const G4int kDim = 2;
 /// the accumulated values are filled in histograms and a Ntuple
 /// event by event in EventAction.
 
-class RunData : public G4Run
-{
+class RunData : public G4Run {
 public:
   RunData() = default;
   ~RunData() override = default;
@@ -68,10 +64,6 @@ inline G4double  RunData::GetEdep(G4int id) const {
 inline G4double  RunData::GetTrackLength(G4int id) const {
   return fTrackLength[id];
 }
-
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
 

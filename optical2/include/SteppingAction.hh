@@ -7,8 +7,6 @@ namespace B4 {
   class DetectorConstruction;
 }
 
-namespace B4b {
-
 /// Stepping action class.
 ///
 /// In UserSteppingAction() there are collected the energy deposit and track
@@ -26,8 +24,6 @@ public:
 private:
   const B4::DetectorConstruction* fDetConstruction = nullptr;
 };
-
-}
 
 
 #endif

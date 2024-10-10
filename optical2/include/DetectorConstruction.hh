@@ -7,25 +7,9 @@
 class G4VPhysicalVolume;
 class G4GlobalMagFieldMessenger;
 
-namespace B4
-{
+namespace B4 {
 
-/// Detector construction class to define materials and geometry.
-/// The calorimeter is a box made of a given number of layers. A layer consists
-/// of an absorber plate and of a detection gap. The layer is replicated.
-///
-/// Four parameters define the geometry of the calorimeter :
-///
-/// - the thickness of an absorber plate,
-/// - the thickness of a gap,
-/// - the number of layers,
-/// - the transverse size of the calorimeter (the input face is a square).
-///
-/// In addition a transverse uniform magnetic field is defined
-/// via G4GlobalMagFieldMessenger class.
-
-class DetectorConstruction : public G4VUserDetectorConstruction
-{
+class DetectorConstruction : public G4VUserDetectorConstruction {
   public:
     DetectorConstruction() = default;
     ~DetectorConstruction() override = default;
@@ -67,8 +51,6 @@ inline const G4VPhysicalVolume* DetectorConstruction::GetGapPV() const  {
 }
 
 }
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
 

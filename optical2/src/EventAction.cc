@@ -8,9 +8,6 @@
 #include "Randomize.hh"
 #include <iomanip>
 
-namespace B4b
-{
-
 // ---
 void EventAction::PrintEventStatistics(
                               G4double absoEdep, G4double absoTrackLength,
@@ -60,4 +57,3 @@ void EventAction::EndOfEventAction(const G4Event* event) {
   // -mxp- end comment
 }
 
-}

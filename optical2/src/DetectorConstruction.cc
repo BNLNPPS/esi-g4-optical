@@ -57,7 +57,7 @@ void DetectorConstruction::DefineMaterials() {
   G4cout << *(G4Material::GetMaterialTable()) << G4endl;
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+// ---
 
 G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
   // Geometry parameters
@@ -187,9 +187,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
     0,                                         // copy number
     fCheckOverlaps);                           // checking overlaps
 
-  //
-  // print parameters
-  //
+
   G4cout
     << G4endl
     << "------------------------------------------------------------" << G4endl
@@ -199,14 +197,12 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
     << gapThickness/mm << "mm of " << gapMaterial->GetName() << " ] " << G4endl
     << "------------------------------------------------------------" << G4endl;
 
-  //
+  // --
   // Visualization attributes
-  //
   worldLV->SetVisAttributes(G4VisAttributes::GetInvisible());
   calorLV->SetVisAttributes(G4VisAttributes(G4Colour::White()));
 
-  //
-  // Always return the physical World
+  // Always return the physical World !!!!!!!!!!!!!!!!!!!!!!!!!!
   //
   return worldPV;
 }
@@ -215,7 +211,6 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
 
 void DetectorConstruction::ConstructSDandField()
 {
-  // Firld Messenger.
   // Uniform magnetic field is then created automatically if  the field value is not zero.
   G4ThreeVector fieldValue;
   fMagFieldMessenger = new G4GlobalMagFieldMessenger(fieldValue);

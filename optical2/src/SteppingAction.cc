@@ -7,8 +7,6 @@
 
 using namespace B4;
 
-namespace B4b {
-
 // ---
 SteppingAction::SteppingAction(const DetectorConstruction* detConstruction): fDetConstruction(detConstruction) {}
 
@@ -40,7 +38,5 @@ void SteppingAction::UserSteppingAction(const G4Step* step) {
   //   runData->Add(kGap, edep, stepLength);
   // }
   // -mxp- end comment
-
-}
 
 }

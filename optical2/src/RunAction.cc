@@ -7,9 +7,6 @@
 #include "G4UnitsTable.hh"
 #include "G4SystemOfUnits.hh"
 
-namespace B4b
-{
-
 // ---
 // Define print frequency, analysis manager and its verbosity
 
@@ -121,4 +118,3 @@ void RunAction::EndOfRunAction(const G4Run* /*aRun*/) {
 
 }
 
-}

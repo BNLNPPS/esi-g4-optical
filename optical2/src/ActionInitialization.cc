@@ -8,8 +8,6 @@
 
 using namespace B4;
 
-namespace B4b {
-
 // ---
 ActionInitialization::ActionInitialization(DetectorConstruction* detConstruction)
  : fDetConstruction(detConstruction) {}
@@ -25,6 +23,4 @@ void ActionInitialization::Build() const {
   SetUserAction(new RunAction);
   SetUserAction(new EventAction);
   SetUserAction(new SteppingAction(fDetConstruction));
-}
-
 }
