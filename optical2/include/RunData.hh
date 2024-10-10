@@ -1,5 +1,5 @@
-#ifndef B4bRunData_h
-#define B4bRunData_h 1
+#ifndef RunData_h
+#define RunData_h 1
 
 #include "G4Run.hh"
 #include "globals.hh"

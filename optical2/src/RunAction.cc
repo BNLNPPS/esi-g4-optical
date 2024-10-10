@@ -10,7 +10,6 @@
 // ---
 // Define print frequency, analysis manager and its verbosity
 
-
 RunAction::RunAction() {
   // -mxp-
   return;
@@ -64,11 +63,7 @@ void RunAction::BeginOfRunAction(const G4Run* run) {
 
   // Open an output file
   //
-  G4String fileName = "B4.root";
-  // Other supported output types:
-  // G4String fileName = "B4.csv";
-  // G4String fileName = "B4.hdf5";
-  // G4String fileName = "B4.xml";
+  G4String fileName = "B4.root";  // Other supported output types: csv, hdf5, xml
   analysisManager->OpenFile(fileName);
   G4cout << "Using " << analysisManager->GetType() << G4endl;
 }
