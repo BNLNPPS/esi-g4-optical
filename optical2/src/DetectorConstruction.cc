@@ -1,32 +1,3 @@
-//
-// ********************************************************************
-// * License and Disclaimer                                           *
-// *                                                                  *
-// * The  Geant4 software  is  copyright of the Copyright Holders  of *
-// * the Geant4 Collaboration.  It is provided  under  the terms  and *
-// * conditions of the Geant4 Software License,  included in the file *
-// * LICENSE and available at  http://cern.ch/geant4/license .  These *
-// * include a list of copyright holders.                             *
-// *                                                                  *
-// * Neither the authors of this software system, nor their employing *
-// * institutes,nor the agencies providing financial support for this *
-// * work  make  any representation or  warranty, express or implied, *
-// * regarding  this  software system or assume any liability for its *
-// * use.  Please see the license in the file  LICENSE  and URL above *
-// * for the full disclaimer and the limitation of liability.         *
-// *                                                                  *
-// * This  code  implementation is the result of  the  scientific and *
-// * technical work of the GEANT4 collaboration.                      *
-// * By using,  copying,  modifying or  distributing the software (or *
-// * any work based  on the software)  you  agree  to acknowledge its *
-// * use  in  resulting  scientific  publications,  and indicate your *
-// * acceptance of all terms of the Geant4 Software license.          *
-// ********************************************************************
-//
-//
-/// \file B4/B4b/src/DetectorConstruction.cc
-/// \brief Implementation of the B4:DetectorConstruction class
-
 #include "DetectorConstruction.hh"
 
 #include "G4Material.hh"
@@ -50,18 +21,14 @@
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
 
-namespace B4
-{
+namespace B4 {
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
+// ---
 G4ThreadLocal
 G4GlobalMagFieldMessenger* DetectorConstruction::fMagFieldMessenger = nullptr;
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-G4VPhysicalVolume* DetectorConstruction::Construct()
-{
+G4VPhysicalVolume* DetectorConstruction::Construct() {
   // Define materials
   DefineMaterials();
 
@@ -69,10 +36,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   return DefineVolumes();
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void DetectorConstruction::DefineMaterials()
-{
+// --
+void DetectorConstruction::DefineMaterials() {
   // Lead material defined using NIST Manager
   auto nistManager = G4NistManager::Instance();
   nistManager->FindOrBuildMaterial("G4_Pb");
@@ -94,13 +59,12 @@ void DetectorConstruction::DefineMaterials()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
-{
+G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
   // Geometry parameters
-  G4int nofLayers = 10;
-  G4double absoThickness = 10.*mm;
-  G4double gapThickness =  5.*mm;
-  G4double calorSizeXY  = 10.*cm;
+  G4int    nofLayers      = 10;
+  G4double absoThickness  = 10.*mm;
+  G4double gapThickness   =  5.*mm;
+  G4double calorSizeXY    = 10.*cm;
 
   auto layerThickness = absoThickness + gapThickness;
   auto calorThickness = nofLayers * layerThickness;
@@ -108,20 +72,18 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   auto worldSizeZ  = 1.2 * calorThickness;
 
   // Get materials
-  auto defaultMaterial = G4Material::GetMaterial("Galactic");
+  auto defaultMaterial  = G4Material::GetMaterial("Galactic");
   auto absorberMaterial = G4Material::GetMaterial("G4_Pb");
-  auto gapMaterial = G4Material::GetMaterial("liquidArgon");
+  auto gapMaterial      = G4Material::GetMaterial("liquidArgon");
 
   if ( ! defaultMaterial || ! absorberMaterial || ! gapMaterial ) {
     G4ExceptionDescription msg;
     msg << "Cannot retrieve materials already defined.";
-    G4Exception("DetectorConstruction::DefineVolumes()",
-      "MyCode0001", FatalException, msg);
+    G4Exception("DetectorConstruction::DefineVolumes()", "MyCode0001", FatalException, msg);
   }
 
-  //
+  // ---
   // World
-  //
   auto worldS
     = new G4Box("World",           // its name
                  worldSizeXY/2, worldSizeXY/2, worldSizeZ/2); // its size
@@ -141,9 +103,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
     0,                                       // copy number
     fCheckOverlaps);                         // checking overlaps
 
-  //
+  // ---
   // Calorimeter
-  //
   auto calorimeterS
     = new G4Box("Calorimeter",     // its name
                  calorSizeXY/2, calorSizeXY/2, calorThickness/2); // its size
@@ -163,9 +124,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
     0,                        // copy number
     fCheckOverlaps);          // checking overlaps
 
-  //
+  // ---
   // Layer
-  //
   auto layerS
     = new G4Box("Layer",           // its name
                  calorSizeXY/2, calorSizeXY/2, layerThickness/2); // its size
@@ -184,9 +144,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                  nofLayers,        // number of replica
                  layerThickness);  // witdth of replica
 
-  //
+  // ---
   // Absorber
-  //
   auto absorberS
     = new G4Box("Abso",            // its name
                  calorSizeXY/2, calorSizeXY/2, absoThickness/2); // its size
@@ -252,13 +211,12 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   return worldPV;
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+// ---
 
 void DetectorConstruction::ConstructSDandField()
 {
-  // Create global magnetic field messenger.
-  // Uniform magnetic field is then created automatically if
-  // the field value is not zero.
+  // Firld Messenger.
+  // Uniform magnetic field is then created automatically if  the field value is not zero.
   G4ThreeVector fieldValue;
   fMagFieldMessenger = new G4GlobalMagFieldMessenger(fieldValue);
   fMagFieldMessenger->SetVerboseLevel(1);
@@ -267,7 +225,6 @@ void DetectorConstruction::ConstructSDandField()
   G4AutoDelete::Register(fMagFieldMessenger);
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 }
 

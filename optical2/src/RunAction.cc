@@ -11,8 +11,12 @@ namespace B4b
 {
 
 // ---
+// Define print frequency, analysis manager and its verbosity
+
 
 RunAction::RunAction() {
+  // -mxp-
+  return;
   // set printing event number per each event
   G4RunManager::GetRunManager()->SetPrintProgress(1);
 
@@ -51,6 +55,8 @@ G4Run* RunAction::GenerateRun() {
 // ---
 
 void RunAction::BeginOfRunAction(const G4Run* run) {
+  // -mxp-
+  return;
   G4cout << "### Run " << run->GetRunID() << " start." << G4endl;
 
   //inform the runManager to save random number seed
@@ -73,6 +79,10 @@ void RunAction::BeginOfRunAction(const G4Run* run) {
 // ---
 
 void RunAction::EndOfRunAction(const G4Run* /*aRun*/) {
+  // --mxp--
+  return;
+
+
   // print histogram statistics
   auto analysisManager = G4AnalysisManager::Instance();
   if ( analysisManager->GetH1(1) ) {

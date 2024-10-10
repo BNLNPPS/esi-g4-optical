@@ -35,8 +35,8 @@ class RunAction : public G4UserRunAction
 
     G4Run* GenerateRun() override;
 
-    void BeginOfRunAction(const G4Run*) override;
-    void   EndOfRunAction(const G4Run*) override;
+    void    BeginOfRunAction(const G4Run*) override;
+    void    EndOfRunAction(const G4Run*) override;
 };
 
 }

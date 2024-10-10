@@ -31,8 +31,8 @@ void EventAction::PrintEventStatistics(
 }
 
 // ---
-void EventAction::BeginOfEventAction(const G4Event* /*event*/)
-{
+void EventAction::BeginOfEventAction(const G4Event* /*event*/) {
+
   auto runData
     = static_cast<RunData*>(
         G4RunManager::GetRunManager()->GetNonConstCurrentRun());
@@ -42,20 +42,22 @@ void EventAction::BeginOfEventAction(const G4Event* /*event*/)
 // ---
 void EventAction::EndOfEventAction(const G4Event* event) {
   auto runData = static_cast<RunData*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
-  runData->FillPerEvent();
+  // -mxp- begin comment
+  // runData->FillPerEvent();
 
-  //print per event (modulo n)
 
-  auto eventID = event->GetEventID();
-  auto printModulo = G4RunManager::GetRunManager()->GetPrintProgress();
-  if ( ( printModulo > 0 ) && ( eventID % printModulo == 0 ) ) {
-    PrintEventStatistics(
-      runData->GetEdep(kAbs),
-      runData->GetTrackLength(kAbs),
-      runData->GetEdep(kGap),
-      runData->GetTrackLength(kGap));
-    G4cout << "--> End of event " << eventID << "\n" << G4endl;      
-  }
+  // auto eventID = event->GetEventID();
+  // auto printModulo = G4RunManager::GetRunManager()->GetPrintProgress();
+ 
+  // if ( ( printModulo > 0 ) && ( eventID % printModulo == 0 ) ) {
+  //   PrintEventStatistics(
+  //     runData->GetEdep(kAbs),
+  //     runData->GetTrackLength(kAbs),
+  //     runData->GetEdep(kGap),
+  //     runData->GetTrackLength(kGap));
+  //   G4cout << "--> End of event " << eventID << "\n" << G4endl;      
+  // }
+  // -mxp- end comment
 }
 
 }

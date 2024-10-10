@@ -36,5 +36,5 @@
 /run/beamOn 10
 #
 # verbosity
-/tracking/verbose 0
+/tracking/verbose 2
 /run/beamOn 1

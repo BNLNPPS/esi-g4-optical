@@ -14,29 +14,33 @@ SteppingAction::SteppingAction(const DetectorConstruction* detConstruction): fDe
 
 // ---
 void SteppingAction::UserSteppingAction(const G4Step* step) {
-  // Collect energy and track length step by step
-  // get volume of the current step
-  auto volume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
 
-  // energy deposit
-  auto edep = step->GetTotalEnergyDeposit();
+  // -mxp- begin comment
 
-  // step length
-  G4double stepLength = 0.;
-  if ( step->GetTrack()->GetDefinition()->GetPDGCharge() != 0. ) {
-    stepLength = step->GetStepLength();
-  }
+  // Collect energy and track length step by step   // get volume of the current step
+  // auto volume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
 
-  auto runData = static_cast<RunData*>
-    (G4RunManager::GetRunManager()->GetNonConstCurrentRun());
+  // // energy deposit
+  // auto edep = step->GetTotalEnergyDeposit();
 
-  if ( volume == fDetConstruction->GetAbsorberPV() ) {
-    runData->Add(kAbs, edep, stepLength);
-  }
+  // // step length
+  // G4double stepLength = 0.;
+  // if ( step->GetTrack()->GetDefinition()->GetPDGCharge() != 0. ) {
+  //   stepLength = step->GetStepLength();
+  // }
 
-  if ( volume == fDetConstruction->GetGapPV() ) {
-    runData->Add(kGap, edep, stepLength);
-  }
+  // auto runData = static_cast<RunData*>
+  //   (G4RunManager::GetRunManager()->GetNonConstCurrentRun());
+
+  // if ( volume == fDetConstruction->GetAbsorberPV() ) {
+  //   runData->Add(kAbs, edep, stepLength);
+  // }
+
+  // if ( volume == fDetConstruction->GetGapPV() ) {
+  //   runData->Add(kGap, edep, stepLength);
+  // }
+  // -mxp- end comment
+
 }
 
 }

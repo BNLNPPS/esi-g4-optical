@@ -32,6 +32,7 @@
 /gui/addButton viewer "Flush viewer (= refresh + update)" "/vis/viewer/flush"
 /gui/addButton viewer "Update scene" "/vis/scene/notifyHandlers"
 #
-# To limit the output flow in the "dump" widget :
-/run/printProgress 100
+
+# This will define the print frequency in the EventAction -- important
+/run/printProgress 1
 #
