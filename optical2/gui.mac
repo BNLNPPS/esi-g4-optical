@@ -34,5 +34,5 @@
 #
 
 # This will define the print frequency in the EventAction -- important
-/run/printProgress 1
+/run/printProgress 1000000000
 #

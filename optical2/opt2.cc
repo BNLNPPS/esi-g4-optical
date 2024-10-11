@@ -30,16 +30,9 @@ namespace {
 int main(int argc,char** argv)
 {
   // Evaluate arguments
-  //
-  if ( argc > 7 ) {
-    PrintUsage();
-    return 1;
-  }
+  if ( argc > 7 ) {PrintUsage(); return 1;}
 
-
-  // --mxp--
-  // We use lyra to parse the command line:
-
+  // --mxp--: We use lyra to parse the command line:
   bool help                 =   false;
   std::string mac_name      = "init_vis.mac";
   std::string output_format = "";  
@@ -55,12 +48,7 @@ int main(int argc,char** argv)
   auto result = cli.parse({ argc, argv });
 
   // Optionally, print help and exit:
-  if(help) {
-    std::cout << cli << std::endl;
-    exit(0);
-  }
-
-
+  if(help) {std::cout << cli << std::endl; exit(0);}
 
   G4String macro;
   G4String session;
@@ -119,7 +107,9 @@ int main(int argc,char** argv)
   auto detConstruction = new DetectorConstruction();
   runManager->SetUserInitialization(detConstruction);
 
-  auto physicsList = new FTFP_BERT;
+  G4int verbose = 0;
+
+  auto physicsList = new FTFP_BERT(verbose);
   runManager->SetUserInitialization(physicsList);
 
   auto actionInitialization = new ActionInitialization(detConstruction);
@@ -151,10 +141,8 @@ int main(int argc,char** argv)
     delete ui;
   }
 
-  // Job termination
-  // Free the store: user actions, physics_list and detector_description are
-  // owned and deleted by the run manager, so they should not be deleted
-  // in the main() program !
+  // Termination: free the store. User actions, physics_list and detector_description are owned and
+  // deleted by the run manager, so they should not be deleted in the main() program
 
   delete visManager;
   delete runManager;

@@ -14,7 +14,8 @@ RunAction::RunAction() {
   // -mxp-
   return;
   // set printing event number per each event
-  G4RunManager::GetRunManager()->SetPrintProgress(1);
+  // Mind gui.mac!!!!!!!!!!!!
+  G4RunManager::GetRunManager()->SetPrintProgress(1000000);
 
   // Create analysis manager.  The choice of analysis technology is done via selectin of a namespace in Analysis.hh
   auto analysisManager = G4AnalysisManager::Instance();
@@ -22,7 +23,7 @@ RunAction::RunAction() {
   // Create directories
   //analysisManager->SetHistoDirectoryName("histograms");
   //analysisManager->SetNtupleDirectoryName("ntuple");
-  analysisManager->SetVerboseLevel(1);
+  analysisManager->SetVerboseLevel(0);
   analysisManager->SetNtupleMerging(true);
     // Note: merging ntuples is available only with Root output
 

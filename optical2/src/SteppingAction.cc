@@ -5,13 +5,25 @@
 #include "G4Step.hh"
 #include "G4RunManager.hh"
 
+#include "G4ParticleDefinition.hh"
+#include "G4ParticleTypes.hh"
+
+
 // ---
 SteppingAction::SteppingAction(const DetectorConstruction* detConstruction): fDetConstruction(detConstruction) {}
 
 // ---
 void SteppingAction::UserSteppingAction(const G4Step* step) {
 
-  // -mxp- begin comment
+  // -mxp- using logic in "optical1"
+  G4Track* theTrack = step->GetTrack();
+  if(theTrack->GetDefinition()==G4OpticalPhoton::OpticalPhotonDefinition()) {
+    G4cout << "+" << G4endl;
+  }
+
+
+
+  // -mxp- begin comment previous content
 
   // Collect energy and track length step by step   // get volume of the current step
   // auto volume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();

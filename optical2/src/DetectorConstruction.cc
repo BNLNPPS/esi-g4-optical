@@ -61,6 +61,7 @@ void DetectorConstruction::DefineMaterials() {
   _mpt = new G4MaterialPropertiesTable();  
 
   // -mxp- this original code throws a warning exception, but apparently you need to "init" a property first.
+  // This probably can be improved (i.e. skip to the second part)
   G4int numEntries = 1;
   _mpt->AddProperty("RINDEX", &photonEnergy[0], &refractiveIndex1[0], numEntries);  
 
@@ -83,9 +84,9 @@ void DetectorConstruction::DefineMaterials() {
 
 
   // FIXME Better make a flag to print the necessary info instead of comment/uncomment
-  G4cout << *(G4Material::GetMaterialTable()) << G4endl;
-  G4cout << "Water G4MaterialPropertiesTable:" << G4endl;
-  _mpt->DumpTable();
+  // G4cout << *(G4Material::GetMaterialTable()) << G4endl;
+  // G4cout << "Water G4MaterialPropertiesTable:" << G4endl;
+  // _mpt->DumpTable();
 
   _DetectorMaterial->SetMaterialPropertiesTable(_mpt);
 
@@ -117,7 +118,6 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
 
 
   // **********************************************************************
-  //
   // We'll build: - the world, - the apparatus, - the optical detector
 
   G4VSolid *worldSolid              = new G4Box("worldBox", 10.*m, 10.*m, 10.*m);
@@ -131,7 +131,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
   new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), apparatusLogical, "apparatusPhysical", worldLogical, false, 0, checkOverlaps);
 
   // Detector
-  G4VSolid *detectorSolid = new G4Box("detectorBox", 10. * cm, 10. * cm, 10. * cm);
+  G4VSolid *detectorSolid = new G4Box("detectorBox", 10.*cm, 10.*cm, 10.*cm);
   _DetectorLogical = new G4LogicalVolume(detectorSolid, _DetectorMaterial, "detectorLogical");
   new G4PVPlacement(0, G4ThreeVector(0., 0., 0. * m), _DetectorLogical, "detectorPhysical", apparatusLogical, false, 0, checkOverlaps);
 
@@ -167,6 +167,8 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
 
   return worldPhysical; // return the world physical volume
 
+
+  // --------------------------------------------------------------------------
   // Work in progress, note that the code below is not supposed to run for now
 
   
@@ -324,7 +326,7 @@ void DetectorConstruction::ConstructSDandField()
   // Uniform magnetic field is then created automatically if  the field value is not zero.
   G4ThreeVector fieldValue;
   fMagFieldMessenger = new G4GlobalMagFieldMessenger(fieldValue);
-  fMagFieldMessenger->SetVerboseLevel(1);
+  fMagFieldMessenger->SetVerboseLevel(0);
 
   // Register the field messenger for deleting
   G4AutoDelete::Register(fMagFieldMessenger);

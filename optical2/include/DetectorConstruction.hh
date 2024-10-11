@@ -16,8 +16,7 @@
 #include "G4RotationMatrix.hh"
 #include "G4FieldManager.hh"
 
-// ---
-
+// ----------------------------------------------------------------------------------------
 class OpticalMessenger;
 
 class G4VPhysicalVolume;
@@ -29,15 +28,14 @@ class G4GlobalMagFieldMessenger;
 
 class DetectorConstruction : public G4VUserDetectorConstruction {
   public:
-    DetectorConstruction() = default;
-    ~DetectorConstruction() override = default;
+    DetectorConstruction()            = default;
+    ~DetectorConstruction() override  = default;
 
   public:
-    G4VPhysicalVolume* Construct() override;
-    void ConstructSDandField() override;
+    G4VPhysicalVolume* Construct()  override;
+    void ConstructSDandField()      override;
 
     // get methods
-    //
     const G4VPhysicalVolume* GetAbsorberPV() const;
     const G4VPhysicalVolume* GetGapPV() const;
 
@@ -47,10 +45,8 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
     void DefineMaterials();
     G4VPhysicalVolume* DefineVolumes();
 
+    // ----------------------------------------------------------------------------------------
     // data members
-    //
-
-
     // -mxp-
     G4MaterialPropertiesTable* _mpt;
     OpticalMessenger*   _OpMessenger;
@@ -62,8 +58,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
     // end -mxp-
 
 
-    static G4ThreadLocal G4GlobalMagFieldMessenger*  fMagFieldMessenger;
-                                      // magnetic field messenger
+    static G4ThreadLocal G4GlobalMagFieldMessenger*  fMagFieldMessenger;  // magnetic field messenger
 
     G4VPhysicalVolume* fAbsorberPV = nullptr; // the absorber physical volume
     G4VPhysicalVolume* fGapPV = nullptr;      // the gap physical volume
@@ -77,13 +72,8 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
 // ------------------------------------------------------------------------------------
 // inline functions
 
-inline const G4VPhysicalVolume* DetectorConstruction::GetAbsorberPV() const {
-  return fAbsorberPV;
-}
-
-inline const G4VPhysicalVolume* DetectorConstruction::GetGapPV() const  {
-  return fGapPV;
-}
+inline const G4VPhysicalVolume* DetectorConstruction::GetAbsorberPV() const {return fAbsorberPV;}
+inline const G4VPhysicalVolume* DetectorConstruction::GetGapPV()      const {return fGapPV;}
 
 
 #endif

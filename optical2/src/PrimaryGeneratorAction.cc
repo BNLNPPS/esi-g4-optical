@@ -39,9 +39,10 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
   // on DetectorConstruction class we get world volume
   // from G4LogicalVolumeStore
   //
-  G4double worldZHalfLength = 0.;
-  auto worldLV = G4LogicalVolumeStore::GetInstance()->GetVolume("World");
 
+  G4double worldZHalfLength = 0.;
+  auto worldLV = G4LogicalVolumeStore::GetInstance()->GetVolume("worldLogical");
+  auto detecLV = G4LogicalVolumeStore::GetInstance()->GetVolume("detectorLogical");
   // Check that the world volume has box shape
   G4Box* worldBox = nullptr;
   if (  worldLV ) {
@@ -60,8 +61,12 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
       "MyCode0002", JustWarning, msg);
   }
 
+  G4Box* detecBox = nullptr;
+  detecBox = dynamic_cast<G4Box*>(detecLV->GetSolid());
+
+  G4double detecZHalfLength = detecBox->GetZHalfLength();
   // Set gun position
-  fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., -worldZHalfLength));
+  fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., -detecZHalfLength));
 
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }
