@@ -6,7 +6,6 @@
 #include "G4MTRunManager.hh"
 #include "DetectorConstruction.hh"
 
-using namespace B4;
 
 // ---
 ActionInitialization::ActionInitialization(DetectorConstruction* detConstruction)

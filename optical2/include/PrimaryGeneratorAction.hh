@@ -7,8 +7,6 @@
 class G4ParticleGun;
 class G4Event;
 
-namespace B4
-{
 
 /// The primary generator action class with particle gum.
 ///
@@ -29,8 +27,5 @@ private:
   G4ParticleGun* fParticleGun = nullptr; // G4 particle gun
 };
 
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif

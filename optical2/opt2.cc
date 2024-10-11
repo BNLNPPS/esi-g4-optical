@@ -116,7 +116,7 @@ int main(int argc,char** argv)
 
   // Set mandatory initialization classes
   //
-  auto detConstruction = new B4::DetectorConstruction();
+  auto detConstruction = new DetectorConstruction();
   runManager->SetUserInitialization(detConstruction);
 
   auto physicsList = new FTFP_BERT;

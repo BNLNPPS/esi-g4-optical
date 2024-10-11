@@ -3,9 +3,7 @@
 
 #include "G4UserSteppingAction.hh"
 
-namespace B4 {
-  class DetectorConstruction;
-}
+class DetectorConstruction;
 
 /// Stepping action class.
 ///
@@ -16,13 +14,13 @@ namespace B4 {
 class SteppingAction : public G4UserSteppingAction
 {
 public:
-  SteppingAction(const B4::DetectorConstruction* detConstruction);
+  SteppingAction(const DetectorConstruction* detConstruction);
   ~SteppingAction() override = default;
 
   void UserSteppingAction(const G4Step* step) override;
 
 private:
-  const B4::DetectorConstruction* fDetConstruction = nullptr;
+  const DetectorConstruction* fDetConstruction = nullptr;
 };
 
 

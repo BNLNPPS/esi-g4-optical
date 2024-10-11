@@ -5,8 +5,6 @@
 #include "G4Step.hh"
 #include "G4RunManager.hh"
 
-using namespace B4;
-
 // ---
 SteppingAction::SteppingAction(const DetectorConstruction* detConstruction): fDetConstruction(detConstruction) {}
 

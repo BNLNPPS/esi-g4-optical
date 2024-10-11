@@ -11,8 +11,6 @@
 #include "G4SystemOfUnits.hh"
 #include "Randomize.hh"
 
-namespace B4 {
-
 // ---
 PrimaryGeneratorAction::PrimaryGeneratorAction() {
   G4int nofParticles = 1;
@@ -68,5 +66,3 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent) {
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }
 
-
-}
