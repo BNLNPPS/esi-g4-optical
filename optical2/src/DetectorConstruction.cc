@@ -148,16 +148,17 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
   visAttributes->SetVisibility(false);
   worldLogical->SetVisAttributes(visAttributes);
   _VisAttributes.push_back(visAttributes);
-  delete(visAttributes);
+  // delete(visAttributes);
 
   visAttributes = new G4VisAttributes(G4Colour(1.0, 1.0, 1.0));
   visAttributes->SetVisibility(false);
   apparatusLogical->SetVisAttributes(visAttributes);
   _VisAttributes.push_back(visAttributes);
+  // delete(visAttributes);
 
-  // visAttributes = new G4VisAttributes(G4Colour(0.8888, 0.0, 0.0));
-  // _DetectorLogical->SetVisAttributes(visAttributes);
-  // _VisAttributes.push_back(visAttributes);
+  visAttributes = new G4VisAttributes(G4Colour(0.8888, 0.0, 0.0));
+  _DetectorLogical->SetVisAttributes(visAttributes);
+  _VisAttributes.push_back(visAttributes);
 
   // visAttributes = new G4VisAttributes(G4Colour(0.8888, 0.8888, 0.0));
   // visAttributes->SetVisibility(false);
