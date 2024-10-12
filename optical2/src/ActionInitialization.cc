@@ -9,7 +9,7 @@
 
 // ---
 ActionInitialization::ActionInitialization(DetectorConstruction* detConstruction)
- : fDetConstruction(detConstruction) {}
+ : _DetConstruction(detConstruction) {}
 
 // ---
 void ActionInitialization::BuildForMaster() const {
@@ -21,5 +21,5 @@ void ActionInitialization::Build() const {
   SetUserAction(new PrimaryGeneratorAction);
   SetUserAction(new RunAction);
   SetUserAction(new EventAction);
-  SetUserAction(new SteppingAction(fDetConstruction));
+  SetUserAction(new SteppingAction(_DetConstruction));
 }

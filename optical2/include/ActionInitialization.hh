@@ -16,7 +16,7 @@ class ActionInitialization : public G4VUserActionInitialization {
     void Build() const override;
 
   private:
-    DetectorConstruction* fDetConstruction = nullptr;
+    DetectorConstruction* _DetConstruction = nullptr;
 };
 
 #endif

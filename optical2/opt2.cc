@@ -7,7 +7,12 @@
 #include "G4UImanager.hh"
 #include "G4UIExecutive.hh"
 #include "G4VisExecutive.hh"
+// important for optical
+#include "G4EmStandardPhysics_option4.hh"
+#include "G4OpticalPhysics.hh"
 #include "FTFP_BERT.hh"
+// ---
+
 #include "Randomize.hh"
 
 // CLI aruments handling:
@@ -107,9 +112,16 @@ int main(int argc,char** argv)
   auto detConstruction = new DetectorConstruction();
   runManager->SetUserInitialization(detConstruction);
 
-  G4int verbose = 0;
+  auto physicsList = new FTFP_BERT(0);
 
-  auto physicsList = new FTFP_BERT(verbose);
+  // make optics works
+  physicsList->ReplacePhysics(new G4EmStandardPhysics_option4());
+
+  auto opticalPhysics = new G4OpticalPhysics();
+  physicsList->RegisterPhysics(opticalPhysics);
+
+  //
+
   runManager->SetUserInitialization(physicsList);
 
   auto actionInitialization = new ActionInitialization(detConstruction);
