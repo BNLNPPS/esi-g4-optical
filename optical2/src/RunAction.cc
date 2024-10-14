@@ -73,6 +73,9 @@ void RunAction::BeginOfRunAction(const G4Run* run) {
 
 void RunAction::EndOfRunAction(const G4Run* /*aRun*/) {
   // --mxp--
+  auto runData = static_cast<RunData*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
+  G4int N = runData->GetNphotons();
+  G4cout << "Photons " << N << G4endl;
   return;
 
 

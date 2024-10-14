@@ -6,7 +6,6 @@
 #include "G4MTRunManager.hh"
 #include "DetectorConstruction.hh"
 
-
 // ---
 ActionInitialization::ActionInitialization(DetectorConstruction* detConstruction)
  : _DetConstruction(detConstruction) {}

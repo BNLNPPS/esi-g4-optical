@@ -29,7 +29,11 @@ void SteppingAction::UserSteppingAction(const G4Step *step)
       double z_dir = step->GetTrack()->GetMomentumDirection()[2];
       double energy = step->GetPostStepPoint()->GetKineticEnergy();
 
-      G4cout << "***" << energy << G4endl;
+      // G4cout << "***" << energy << G4endl;
+      theTrack->SetTrackStatus(fStopAndKill);
+      auto runData = static_cast<RunData*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
+      runData->AddPhoton();
+
 
       // auto analysisManager = G4AnalysisManager::Instance();
       // if (analysisManager->IsOpenFile())
@@ -52,30 +56,32 @@ void SteppingAction::UserSteppingAction(const G4Step *step)
       */
     }
 
-    // -mxp- begin comment previous content
-
-    // Collect energy and track length step by step   // get volume of the current step
-    // auto volume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
-
-    // // energy deposit
-    // auto edep = step->GetTotalEnergyDeposit();
-
-    // // step length
-    // G4double stepLength = 0.;
-    // if ( step->GetTrack()->GetDefinition()->GetPDGCharge() != 0. ) {
-    //   stepLength = step->GetStepLength();
-    // }
-
-    // auto runData = static_cast<RunData*>
-    //   (G4RunManager::GetRunManager()->GetNonConstCurrentRun());
-
-    // if ( volume == fDetConstruction->GetAbsorberPV() ) {
-    //   runData->Add(kAbs, edep, stepLength);
-    // }
-
-    // if ( volume == fDetConstruction->GetGapPV() ) {
-    //   runData->Add(kGap, edep, stepLength);
-    // }
-    // -mxp- end comment
   }
 }
+
+
+  // -mxp- begin comment previous content
+
+  // Collect energy and track length step by step   // get volume of the current step
+  // auto volume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
+
+  // // energy deposit
+  // auto edep = step->GetTotalEnergyDeposit();
+
+  // // step length
+  // G4double stepLength = 0.;
+  // if ( step->GetTrack()->GetDefinition()->GetPDGCharge() != 0. ) {
+  //   stepLength = step->GetStepLength();
+  // }
+
+  // auto runData = static_cast<RunData*>
+  //   (G4RunManager::GetRunManager()->GetNonConstCurrentRun());
+
+  // if ( volume == fDetConstruction->GetAbsorberPV() ) {
+  //   runData->Add(kAbs, edep, stepLength);
+  // }
+
+  // if ( volume == fDetConstruction->GetGapPV() ) {
+  //   runData->Add(kGap, edep, stepLength);
+  // }
+  // -mxp- end comment
