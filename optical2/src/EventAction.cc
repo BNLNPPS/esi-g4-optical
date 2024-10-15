@@ -30,15 +30,18 @@ void EventAction::PrintEventStatistics(
 // ---
 void EventAction::BeginOfEventAction(const G4Event* /*event*/) {
 
-  auto runData
-    = static_cast<RunData*>(
-        G4RunManager::GetRunManager()->GetNonConstCurrentRun());
+  auto runData = static_cast<RunData*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
   runData->Reset();
 }
 
 // ---
 void EventAction::EndOfEventAction(const G4Event* event) {
   auto runData = static_cast<RunData*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
+  G4int N = runData->GetNphotons();
+  G4cout << "Photons in Event:" << N << G4endl;
+
+  runData->FillPerEvent();
+
   // -mxp- begin comment
   // runData->FillPerEvent();
 

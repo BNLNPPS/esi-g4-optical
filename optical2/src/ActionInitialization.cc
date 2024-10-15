@@ -12,13 +12,21 @@ ActionInitialization::ActionInitialization(DetectorConstruction* detConstruction
 
 // ---
 void ActionInitialization::BuildForMaster() const {
-  SetUserAction(new RunAction);
+  RunAction* rA = new RunAction;
+  rA->SetFilename("my.root");
+  SetUserAction(rA);
 }
 
 // ---
 void ActionInitialization::Build() const {
   SetUserAction(new PrimaryGeneratorAction);
-  SetUserAction(new RunAction);
+
+  RunAction* rA = new RunAction;
+  rA->SetFilename("my.root");
+  SetUserAction(rA);
+
+  //  SetUserAction(new RunAction);
+
   SetUserAction(new EventAction);
   SetUserAction(new SteppingAction(_DetConstruction));
 }

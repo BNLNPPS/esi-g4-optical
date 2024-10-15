@@ -125,7 +125,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
   G4VPhysicalVolume *worldPhysical  = new G4PVPlacement(0, G4ThreeVector(), worldLogical, "worldPhysical", 0, false, 0, checkOverlaps);
 
   // The apparatus
-  G4VSolid *apparatusSolid          = new G4Box("apparatusBox", 9.*m, 9.*m, 9.*m);
+  G4VSolid *apparatusSolid          = new G4Box("apparatusBox", 90.*cm, 90.*cm, 90.*cm);
   G4LogicalVolume *apparatusLogical = new G4LogicalVolume(apparatusSolid, air, "apparatusLogical");
 
   new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), apparatusLogical, "apparatusPhysical", worldLogical, false, 0, checkOverlaps);

@@ -7,44 +7,29 @@
 #include "G4UImanager.hh"
 #include "G4UIExecutive.hh"
 #include "G4VisExecutive.hh"
+#include "Randomize.hh"
 // important for optical
 #include "G4EmStandardPhysics_option4.hh"
 #include "G4OpticalPhysics.hh"
 #include "FTFP_BERT.hh"
 // ---
-
-#include "Randomize.hh"
-
 // CLI aruments handling:
 #include "lyra.hpp"
 
-// ---
+// -----------------------------------------------------------
 
-namespace {
-  void PrintUsage() {
-    G4cerr << " Usage: " << G4endl;
-    G4cerr << " Opt2 [-m macro ] [-u UIsession] [-t nThreads] [-vDefault]"
-           << G4endl;
-    G4cerr << "   note: -t option is available only for multi-threaded mode."
-           << G4endl;
-  }
-}
-
-// ---
-
-int main(int argc,char** argv)
-{
-  // Evaluate arguments
-  if ( argc > 7 ) {PrintUsage(); return 1;}
-
+int main(int argc,char** argv) {
   // --mxp--: We use lyra to parse the command line:
   bool help               =   false;
+  bool batch              =   false;
+
   G4String macro          = "init_vis.mac";
   G4String output_format  = "";  
   int threads = 0;
 
   auto cli = lyra::cli()
       | lyra::help(help)
+      | lyra::opt(batch)
       | lyra::opt(macro, "macro")
         ["-m"]["--macro"]("macro: default: init_vis.mac, otherwise specify the name of the G4 macro file to be run")
       | lyra::opt(output_format, "output_format")
@@ -58,7 +43,6 @@ int main(int argc,char** argv)
   // Optionally, print help and exit:
   if(help) {std::cout << cli << std::endl; exit(0);}
 
-
   G4String  session;
   G4bool    verboseBestUnits = true;
 
@@ -67,18 +51,20 @@ int main(int argc,char** argv)
   nThreads = threads;
 #endif
 
-
+  G4cout << "batch mode:" << batch << G4endl;
   G4cout << "threads:" << nThreads << G4endl;
   G4cout << "output format:" << output_format << G4endl;
   G4cout << "macro:" << macro << G4endl;
 
-  exit(0);
+  // exit(0);
 
   // Detect interactive mode (if no macro provided) and define UI session
   //
   G4UIExecutive* ui = nullptr;
-  if ( ! macro.size() ) {
-    ui = new G4UIExecutive(argc, argv, session);
+  if ( ! batch ) {
+    argc = 1;
+    if(argc == 1) ui = new G4UIExecutive(argc, argv);
+    // ui = new G4UIExecutive(argc, argv, session);
   }
 
   // Optionally: choose a different Random engine...
@@ -128,15 +114,16 @@ int main(int argc,char** argv)
   // Get the pointer to the User Interface manager
   auto UImanager = G4UImanager::GetUIpointer();
 
+
+  // ################################################################################
   // Process macro or start UI session
   //
-  if ( macro.size() ) {
+  if ( macro.size() && batch ) {
     // batch mode
     G4String command = "/control/execute ";
     UImanager->ApplyCommand(command+macro);
   }
-  else  {
-    // interactive mode : define UI session
+  else  { // interactive mode : define UI session
     UImanager->ApplyCommand("/control/execute init_vis.mac");
     if (ui->IsGUI()) {
       UImanager->ApplyCommand("/control/execute gui.mac");

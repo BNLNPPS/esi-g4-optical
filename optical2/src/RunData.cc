@@ -7,29 +7,30 @@
 // ---
 void RunData::FillPerEvent() {
   auto analysisManager = G4AnalysisManager::Instance();
+  analysisManager->FillH1(0, 1000.);
+  G4cout << "Filling H1 in RunData:" << nPhotons << G4endl;
 
-  // accumulate statistic  in the order of the histograms, ntuple columns declarations
-  G4int counter = 0;
-  for ( auto edep : fEdep ) {
-    analysisManager->FillH1(counter, edep);
-    analysisManager->FillNtupleDColumn(counter++, edep);
-  }
-  for ( auto trackLength : fTrackLength ) {
-    analysisManager->FillH1(counter, trackLength);
-    analysisManager->FillNtupleDColumn(counter++, trackLength);
-  }
+  // // accumulate statistic  in the order of the histograms, ntuple columns declarations
+  // G4int counter = 0;
+  // for ( auto edep : fEdep ) {
+  //   analysisManager->FillH1(counter, edep);
+  //   analysisManager->FillNtupleDColumn(counter++, edep);
+  // }
+  // for ( auto trackLength : fTrackLength ) {
+  //   analysisManager->FillH1(counter, trackLength);
+  //   analysisManager->FillNtupleDColumn(counter++, trackLength);
+  // }
   
-  analysisManager->AddNtupleRow();
+  // analysisManager->AddNtupleRow();
 }
 
 // ---
 
 void RunData::Reset() {
-  for ( auto& edep : fEdep ) {
-    edep = 0.;
-  }
-  for ( auto& trackLength : fTrackLength ) {
-    trackLength = 0.;
-  }
+  nPhotons=0;
+
+  // for ( auto& edep : fEdep ) {edep = 0.;}
+  // for ( auto& trackLength : fTrackLength ) {trackLength = 0.;}
+
 }
 
