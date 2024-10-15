@@ -7,13 +7,12 @@
 #include "DetectorConstruction.hh"
 
 // ---
-ActionInitialization::ActionInitialization(DetectorConstruction* detConstruction)
- : _DetConstruction(detConstruction) {}
+ActionInitialization::ActionInitialization(DetectorConstruction* detConstruction, G4String fn):_DetConstruction(detConstruction), _FileName(fn) {};
 
 // ---
 void ActionInitialization::BuildForMaster() const {
   RunAction* rA = new RunAction;
-  rA->SetFilename("my.root");
+  rA->SetFilename(_FileName);
   SetUserAction(rA);
 }
 
@@ -22,7 +21,7 @@ void ActionInitialization::Build() const {
   SetUserAction(new PrimaryGeneratorAction);
 
   RunAction* rA = new RunAction;
-  rA->SetFilename("my.root");
+  rA->SetFilename(_FileName);
   SetUserAction(rA);
 
   //  SetUserAction(new RunAction);

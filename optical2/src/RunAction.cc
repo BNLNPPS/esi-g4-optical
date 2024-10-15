@@ -12,9 +12,8 @@
 
 RunAction::RunAction() {
 
-  // set printing event number per each event
-  // Mind gui.mac!!!!!!!!!!!!
-  G4RunManager::GetRunManager()->SetPrintProgress(1000000);
+  // set printing event number per each event... Mind gui.mac!
+  G4RunManager::GetRunManager()->SetPrintProgress(10);
 
   // Create analysis manager.  The choice of analysis technology is done via selectin of a namespace in Analysis.hh
   auto analysisManager = G4AnalysisManager::Instance();
@@ -26,7 +25,7 @@ RunAction::RunAction() {
   analysisManager->SetNtupleMerging(true);
 
   analysisManager->CreateH1("Nphotons" ,"Nphotons", 100, 0., 50000.);
-  analysisManager->FillH1(0, 10000.0);
+
   // -mxp-
   return;
     // Note: merging ntuples is available only with Root output

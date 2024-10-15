@@ -24,21 +24,33 @@ int main(int argc,char** argv) {
   bool batch              =   false;
 
   G4String macro          = "init_vis.mac";
-  G4String output_format  = "";  
+  G4String output_file    = "my.root";  
   int threads = 0;
 
-  auto cli = lyra::cli()
-      | lyra::help(help)
-      | lyra::opt(batch)
-      | lyra::opt(macro, "macro")
-        ["-m"]["--macro"]("macro: default: init_vis.mac, otherwise specify the name of the G4 macro file to be run")
-      | lyra::opt(output_format, "output_format")
-        ["-f"]["--output_format"]("default: '', options: csv, root, hdf5")
-      | lyra::opt(threads, "threads")
-        ["-T"]["--threads"]("Number of threads (default 0)")
-    ;
+
+  auto cli = lyra::cli();
+  cli |= lyra::opt(output_file, "output_file")["-o"]["--output_file"]("Output file, default my.root").optional();
+  cli |= lyra::opt(macro, "macro")["-m"]["--macro"]("Optional macro").optional();
+  cli |= lyra::opt(batch, "batch")["-b"]["--batch"]("Optional batch mode").optional();
+  cli |= lyra::opt(threads, "threads")["-t"]["--threads"]("Optional number of threads").optional();
+
+  // auto cli = lyra::cli()
+  //     | lyra::help(help)
+  //     | lyra::opt(batch)
+  //     | lyra::opt(macro, "macro")
+  //       ["-m"]["--macro"]("macro file - default: init_vis.mac, otherwise specify the name of the G4 macro file to be run")
+  //     | lyra::opt(output_file, "output_file")
+  //       ["-f"]["--output_file"]("output file - default: my.root, extension options: csv, root, hdf5")
+  //     | lyra::opt(threads, "threads")
+  //       ["-T"]["--threads"]("Number of threads (default 0)")
+  //   ;
 
   auto result = cli.parse({ argc, argv });
+  if (!result) {
+    std::cerr << "Error in command line" << std::endl;
+    return 1;
+  }
+
 
   // Optionally, print help and exit:
   if(help) {std::cout << cli << std::endl; exit(0);}
@@ -53,7 +65,7 @@ int main(int argc,char** argv) {
 
   G4cout << "batch mode:" << batch << G4endl;
   G4cout << "threads:" << nThreads << G4endl;
-  G4cout << "output format:" << output_format << G4endl;
+  G4cout << "output file:" << output_file << G4endl;
   G4cout << "macro:" << macro << G4endl;
 
   // exit(0);
@@ -98,17 +110,14 @@ int main(int argc,char** argv) {
   auto opticalPhysics = new G4OpticalPhysics();
   physicsList->RegisterPhysics(opticalPhysics);
 
-  //
-
+  // ---
   runManager->SetUserInitialization(physicsList);
 
-  auto actionInitialization = new ActionInitialization(detConstruction);
+  auto actionInitialization = new ActionInitialization(detConstruction, output_file);
   runManager->SetUserInitialization(actionInitialization);
 
-  // Initialize visualization and make it quiet...
+  // Initialize visualization and make it quiet... see /vis/verbose guidance.
   auto visManager = new G4VisExecutive("Quiet");
-  // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
-  // auto visManager = new G4VisExecutive("Quiet");
   visManager->Initialize();
 
   // Get the pointer to the User Interface manager
@@ -125,20 +134,20 @@ int main(int argc,char** argv) {
   }
   else  { // interactive mode : define UI session
     UImanager->ApplyCommand("/control/execute init_vis.mac");
-    if (ui->IsGUI()) {
-      UImanager->ApplyCommand("/control/execute gui.mac");
-    }
+    if (ui->IsGUI()) {UImanager->ApplyCommand("/control/execute gui.mac");}
     ui->SessionStart();
     delete ui;
   }
 
-  // Termination: free the store. User actions, physics_list and detector_description are owned and
-  // deleted by the run manager, so they should not be deleted in the main() program
+  // Cleanup. User actions, the physics list and the detector description are owned and
+  // deleted by the run manager, so don't delete them here
 
   delete visManager;
   delete runManager;
 }
 
+// #############################################################################
+// The old CLI UI, kept for reference only
 //   for ( G4int i=1; i<argc; i=i+2 ) {
 //     if      ( G4String(argv[i]) == "-m" ) macro = argv[i+1];
 //     else if ( G4String(argv[i]) == "-u" ) session = argv[i+1];

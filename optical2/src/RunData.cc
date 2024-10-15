@@ -7,7 +7,7 @@
 // ---
 void RunData::FillPerEvent() {
   auto analysisManager = G4AnalysisManager::Instance();
-  analysisManager->FillH1(0, 1000.);
+  analysisManager->FillH1(0, nPhotons);
   G4cout << "Filling H1 in RunData:" << nPhotons << G4endl;
 
   // // accumulate statistic  in the order of the histograms, ntuple columns declarations
