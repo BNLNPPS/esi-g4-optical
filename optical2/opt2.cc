@@ -23,7 +23,7 @@
 namespace {
   void PrintUsage() {
     G4cerr << " Usage: " << G4endl;
-    G4cerr << " exampleB4b [-m macro ] [-u UIsession] [-t nThreads] [-vDefault]"
+    G4cerr << " Opt2 [-m macro ] [-u UIsession] [-t nThreads] [-vDefault]"
            << G4endl;
     G4cerr << "   note: -t option is available only for multi-threaded mode."
            << G4endl;
@@ -38,16 +38,19 @@ int main(int argc,char** argv)
   if ( argc > 7 ) {PrintUsage(); return 1;}
 
   // --mxp--: We use lyra to parse the command line:
-  bool help                 =   false;
-  std::string mac_name      = "init_vis.mac";
-  std::string output_format = "";  
+  bool help               =   false;
+  G4String macro          = "init_vis.mac";
+  G4String output_format  = "";  
+  int threads = 0;
 
   auto cli = lyra::cli()
       | lyra::help(help)
-      | lyra::opt(mac_name, "mac_name")
-        ["-m"]["--mac_name"]("mac_name: default: init_vis.mac, otherwise specify the name of the G4 macro file to be run")
+      | lyra::opt(macro, "macro")
+        ["-m"]["--macro"]("macro: default: init_vis.mac, otherwise specify the name of the G4 macro file to be run")
       | lyra::opt(output_format, "output_format")
         ["-f"]["--output_format"]("default: '', options: csv, root, hdf5")
+      | lyra::opt(threads, "threads")
+        ["-T"]["--threads"]("Number of threads (default 0)")
     ;
 
   auto result = cli.parse({ argc, argv });
@@ -55,32 +58,21 @@ int main(int argc,char** argv)
   // Optionally, print help and exit:
   if(help) {std::cout << cli << std::endl; exit(0);}
 
-  G4String macro;
-  G4String session;
-  G4bool verboseBestUnits = true;
-#ifdef G4MULTITHREADED
 
-  G4cout << "*********************************************************MT*********************************************************************" << G4endl;
+  G4String  session;
+  G4bool    verboseBestUnits = true;
 
   G4int nThreads = 0;
-#endif
-  for ( G4int i=1; i<argc; i=i+2 ) {
-    if      ( G4String(argv[i]) == "-m" ) macro = argv[i+1];
-    else if ( G4String(argv[i]) == "-u" ) session = argv[i+1];
 #ifdef G4MULTITHREADED
-    else if ( G4String(argv[i]) == "-t" ) {
-      nThreads = G4UIcommand::ConvertToInt(argv[i+1]);
-    }
+  nThreads = threads;
 #endif
-    else if ( G4String(argv[i]) == "-vDefault" ) {
-      verboseBestUnits = false;
-      --i;  // this option is not followed with a parameter
-    }
-    else {
-      PrintUsage();
-      return 1;
-    }
-  }
+
+
+  G4cout << "threads:" << nThreads << G4endl;
+  G4cout << "output format:" << output_format << G4endl;
+  G4cout << "macro:" << macro << G4endl;
+
+  exit(0);
 
   // Detect interactive mode (if no macro provided) and define UI session
   //
@@ -160,3 +152,22 @@ int main(int argc,char** argv)
   delete runManager;
 }
 
+//   for ( G4int i=1; i<argc; i=i+2 ) {
+//     if      ( G4String(argv[i]) == "-m" ) macro = argv[i+1];
+//     else if ( G4String(argv[i]) == "-u" ) session = argv[i+1];
+
+// #ifdef G4MULTITHREADED
+//     else if ( G4String(argv[i]) == "-t" ) {
+
+//       nThreads = G4UIcommand::ConvertToInt(argv[i+1]);
+//     }
+// #endif
+//     else if ( G4String(argv[i]) == "-vDefault" ) {
+//       verboseBestUnits = false;
+//       --i;  // this option is not followed with a parameter
+//     }
+//     else {
+//       PrintUsage();
+//       return 1;
+//     }
+//   }

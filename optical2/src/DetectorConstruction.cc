@@ -120,7 +120,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
   // **********************************************************************
   // We'll build: - the world, - the apparatus, - the optical detector
 
-  G4VSolid *worldSolid              = new G4Box("worldBox", 10.*m, 10.*m, 10.*m);
+  G4VSolid *worldSolid              = new G4Box("worldBox", 1.*m, 1.*m, 1.*m);
   G4LogicalVolume *worldLogical     = new G4LogicalVolume(worldSolid, air, "worldLogical");
   G4VPhysicalVolume *worldPhysical  = new G4PVPlacement(0, G4ThreeVector(), worldLogical, "worldPhysical", 0, false, 0, checkOverlaps);
 
@@ -131,7 +131,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes() {
   new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), apparatusLogical, "apparatusPhysical", worldLogical, false, 0, checkOverlaps);
 
   // Detector
-  G4VSolid *detectorSolid = new G4Box("detectorBox", 10.*cm, 10.*cm, 10.*cm);
+  G4VSolid *detectorSolid = new G4Box("detectorBox", 10.*cm, 10.*cm, 20.*cm);
   _DetectorLogical = new G4LogicalVolume(detectorSolid, _DetectorMaterial, "detectorLogical");
   new G4PVPlacement(0, G4ThreeVector(0., 0., 0. * m), _DetectorLogical, "detectorPhysical", apparatusLogical, false, 0, checkOverlaps);
 
