@@ -34,6 +34,11 @@ class RunAction : public G4UserRunAction
 
     void    BeginOfRunAction(const G4Run*) override;
     void    EndOfRunAction(const G4Run*) override;
+
+    void    SetFilename(const G4String fn) {_filename=fn;}
+
+  private:
+      G4String  _filename;
 };
 
 #endif

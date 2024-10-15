@@ -6,20 +6,26 @@
 #include "G4MTRunManager.hh"
 #include "DetectorConstruction.hh"
 
-
 // ---
-ActionInitialization::ActionInitialization(DetectorConstruction* detConstruction)
- : fDetConstruction(detConstruction) {}
+ActionInitialization::ActionInitialization(DetectorConstruction* detConstruction, G4String fn):_DetConstruction(detConstruction), _FileName(fn) {};
 
 // ---
 void ActionInitialization::BuildForMaster() const {
-  SetUserAction(new RunAction);
+  RunAction* rA = new RunAction;
+  rA->SetFilename(_FileName);
+  SetUserAction(rA);
 }
 
 // ---
 void ActionInitialization::Build() const {
   SetUserAction(new PrimaryGeneratorAction);
-  SetUserAction(new RunAction);
+
+  RunAction* rA = new RunAction;
+  rA->SetFilename(_FileName);
+  SetUserAction(rA);
+
+  //  SetUserAction(new RunAction);
+
   SetUserAction(new EventAction);
-  SetUserAction(new SteppingAction(fDetConstruction));
+  SetUserAction(new SteppingAction(_DetConstruction));
 }

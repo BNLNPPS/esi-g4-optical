@@ -40,7 +40,16 @@ public:
   G4double  GetEdep(G4int id) const;
   G4double  GetTrackLength(G4int id) const;
 
+  void AddPhoton() {nPhotons+=1;}
+  G4int GetNphotons() {return nPhotons;};
+
+
 private:
+
+  G4int nPhotons=0;
+
+
+
   std::array<G4String, kDim>  fVolumeNames = { "Absorber", "Gap" };
   std::array<G4double, kDim>  fEdep = { 0., 0. };
   std::array<G4double, kDim>  fTrackLength = { 0., 0. };

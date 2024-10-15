@@ -7,81 +7,76 @@
 #include "G4UImanager.hh"
 #include "G4UIExecutive.hh"
 #include "G4VisExecutive.hh"
-#include "FTFP_BERT.hh"
 #include "Randomize.hh"
-
+// important for optical
+#include "G4EmStandardPhysics_option4.hh"
+#include "G4OpticalPhysics.hh"
+#include "FTFP_BERT.hh"
+// ---
 // CLI aruments handling:
 #include "lyra.hpp"
 
-// ---
+// -----------------------------------------------------------
 
-namespace {
-  void PrintUsage() {
-    G4cerr << " Usage: " << G4endl;
-    G4cerr << " exampleB4b [-m macro ] [-u UIsession] [-t nThreads] [-vDefault]"
-           << G4endl;
-    G4cerr << "   note: -t option is available only for multi-threaded mode."
-           << G4endl;
-  }
-}
-
-// ---
-
-int main(int argc,char** argv)
-{
-  // Evaluate arguments
-  if ( argc > 7 ) {PrintUsage(); return 1;}
-
+int main(int argc,char** argv) {
   // --mxp--: We use lyra to parse the command line:
-  bool help                 =   false;
-  std::string mac_name      = "init_vis.mac";
-  std::string output_format = "";  
+  bool help               =   false;
+  bool batch              =   false;
 
-  auto cli = lyra::cli()
-      | lyra::help(help)
-      | lyra::opt(mac_name, "mac_name")
-        ["-m"]["--mac_name"]("mac_name: default: init_vis.mac, otherwise specify the name of the G4 macro file to be run")
-      | lyra::opt(output_format, "output_format")
-        ["-f"]["--output_format"]("default: '', options: csv, root, hdf5")
-    ;
+  G4String macro          = "init_vis.mac";
+  G4String output_file    = "my.root";  
+  int threads = 0;
+
+
+  auto cli = lyra::cli();
+  cli |= lyra::opt(output_file, "output_file")["-o"]["--output_file"]("Output file, default my.root").optional();
+  cli |= lyra::opt(macro, "macro")["-m"]["--macro"]("Optional macro").optional();
+  cli |= lyra::opt(batch, "batch")["-b"]["--batch"]("Optional batch mode").optional();
+  cli |= lyra::opt(threads, "threads")["-t"]["--threads"]("Optional number of threads").optional();
+
+  // auto cli = lyra::cli()
+  //     | lyra::help(help)
+  //     | lyra::opt(batch)
+  //     | lyra::opt(macro, "macro")
+  //       ["-m"]["--macro"]("macro file - default: init_vis.mac, otherwise specify the name of the G4 macro file to be run")
+  //     | lyra::opt(output_file, "output_file")
+  //       ["-f"]["--output_file"]("output file - default: my.root, extension options: csv, root, hdf5")
+  //     | lyra::opt(threads, "threads")
+  //       ["-T"]["--threads"]("Number of threads (default 0)")
+  //   ;
 
   auto result = cli.parse({ argc, argv });
+  if (!result) {
+    std::cerr << "Error in command line" << std::endl;
+    return 1;
+  }
+
 
   // Optionally, print help and exit:
   if(help) {std::cout << cli << std::endl; exit(0);}
 
-  G4String macro;
-  G4String session;
-  G4bool verboseBestUnits = true;
-#ifdef G4MULTITHREADED
-
-  G4cout << "*********************************************************MT*********************************************************************" << G4endl;
+  G4String  session;
+  G4bool    verboseBestUnits = true;
 
   G4int nThreads = 0;
-#endif
-  for ( G4int i=1; i<argc; i=i+2 ) {
-    if      ( G4String(argv[i]) == "-m" ) macro = argv[i+1];
-    else if ( G4String(argv[i]) == "-u" ) session = argv[i+1];
 #ifdef G4MULTITHREADED
-    else if ( G4String(argv[i]) == "-t" ) {
-      nThreads = G4UIcommand::ConvertToInt(argv[i+1]);
-    }
+  nThreads = threads;
 #endif
-    else if ( G4String(argv[i]) == "-vDefault" ) {
-      verboseBestUnits = false;
-      --i;  // this option is not followed with a parameter
-    }
-    else {
-      PrintUsage();
-      return 1;
-    }
-  }
+
+  G4cout << "batch mode:" << batch << G4endl;
+  G4cout << "threads:" << nThreads << G4endl;
+  G4cout << "output file:" << output_file << G4endl;
+  G4cout << "macro:" << macro << G4endl;
+
+  // exit(0);
 
   // Detect interactive mode (if no macro provided) and define UI session
   //
   G4UIExecutive* ui = nullptr;
-  if ( ! macro.size() ) {
-    ui = new G4UIExecutive(argc, argv, session);
+  if ( ! batch ) {
+    argc = 1;
+    if(argc == 1) ui = new G4UIExecutive(argc, argv);
+    // ui = new G4UIExecutive(argc, argv, session);
   }
 
   // Optionally: choose a different Random engine...
@@ -107,44 +102,68 @@ int main(int argc,char** argv)
   auto detConstruction = new DetectorConstruction();
   runManager->SetUserInitialization(detConstruction);
 
-  G4int verbose = 0;
+  auto physicsList = new FTFP_BERT(0);
 
-  auto physicsList = new FTFP_BERT(verbose);
+  // make optics works
+  physicsList->ReplacePhysics(new G4EmStandardPhysics_option4());
+
+  auto opticalPhysics = new G4OpticalPhysics();
+  physicsList->RegisterPhysics(opticalPhysics);
+
+  // ---
   runManager->SetUserInitialization(physicsList);
 
-  auto actionInitialization = new ActionInitialization(detConstruction);
+  auto actionInitialization = new ActionInitialization(detConstruction, output_file);
   runManager->SetUserInitialization(actionInitialization);
 
-  // Initialize visualization and make it quiet...
+  // Initialize visualization and make it quiet... see /vis/verbose guidance.
   auto visManager = new G4VisExecutive("Quiet");
-  // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
-  // auto visManager = new G4VisExecutive("Quiet");
   visManager->Initialize();
 
   // Get the pointer to the User Interface manager
   auto UImanager = G4UImanager::GetUIpointer();
 
+
+  // ################################################################################
   // Process macro or start UI session
   //
-  if ( macro.size() ) {
+  if ( macro.size() && batch ) {
     // batch mode
     G4String command = "/control/execute ";
     UImanager->ApplyCommand(command+macro);
   }
-  else  {
-    // interactive mode : define UI session
+  else  { // interactive mode : define UI session
     UImanager->ApplyCommand("/control/execute init_vis.mac");
-    if (ui->IsGUI()) {
-      UImanager->ApplyCommand("/control/execute gui.mac");
-    }
+    if (ui->IsGUI()) {UImanager->ApplyCommand("/control/execute gui.mac");}
     ui->SessionStart();
     delete ui;
   }
 
-  // Termination: free the store. User actions, physics_list and detector_description are owned and
-  // deleted by the run manager, so they should not be deleted in the main() program
+  // Cleanup. User actions, the physics list and the detector description are owned and
+  // deleted by the run manager, so don't delete them here
 
   delete visManager;
   delete runManager;
 }
 
+// #############################################################################
+// The old CLI UI, kept for reference only
+//   for ( G4int i=1; i<argc; i=i+2 ) {
+//     if      ( G4String(argv[i]) == "-m" ) macro = argv[i+1];
+//     else if ( G4String(argv[i]) == "-u" ) session = argv[i+1];
+
+// #ifdef G4MULTITHREADED
+//     else if ( G4String(argv[i]) == "-t" ) {
+
+//       nThreads = G4UIcommand::ConvertToInt(argv[i+1]);
+//     }
+// #endif
+//     else if ( G4String(argv[i]) == "-vDefault" ) {
+//       verboseBestUnits = false;
+//       --i;  // this option is not followed with a parameter
+//     }
+//     else {
+//       PrintUsage();
+//       return 1;
+//     }
+//   }
