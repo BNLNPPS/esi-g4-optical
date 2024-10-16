@@ -24,8 +24,6 @@ void ActionInitialization::Build() const {
   rA->SetFilename(_FileName);
   SetUserAction(rA);
 
-  //  SetUserAction(new RunAction);
-
   SetUserAction(new EventAction);
   SetUserAction(new SteppingAction(_DetConstruction));
 }
