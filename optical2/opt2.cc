@@ -27,30 +27,17 @@ int main(int argc,char** argv) {
   G4String output_file    = "my.root";  
   int threads = 0;
 
-
   auto cli = lyra::cli();
   cli |= lyra::opt(output_file, "output_file")["-o"]["--output_file"]("Output file, default my.root").optional();
-  cli |= lyra::opt(macro, "macro")["-m"]["--macro"]("Optional macro").optional();
-  cli |= lyra::opt(batch, "batch")["-b"]["--batch"]("Optional batch mode").optional();
-  cli |= lyra::opt(threads, "threads")["-t"]["--threads"]("Optional number of threads").optional();
-
-  // auto cli = lyra::cli()
-  //     | lyra::help(help)
-  //     | lyra::opt(batch)
-  //     | lyra::opt(macro, "macro")
-  //       ["-m"]["--macro"]("macro file - default: init_vis.mac, otherwise specify the name of the G4 macro file to be run")
-  //     | lyra::opt(output_file, "output_file")
-  //       ["-f"]["--output_file"]("output file - default: my.root, extension options: csv, root, hdf5")
-  //     | lyra::opt(threads, "threads")
-  //       ["-T"]["--threads"]("Number of threads (default 0)")
-  //   ;
+  cli |= lyra::opt(macro,       "macro")["-m"]["--macro"]("Optional macro").optional();
+  cli |= lyra::opt(batch,       "batch")["-b"]["--batch"]("Optional batch mode").optional();
+  cli |= lyra::opt(threads,     "threads")["-t"]["--threads"]("Optional number of threads").optional();
 
   auto result = cli.parse({ argc, argv });
   if (!result) {
-    std::cerr << "Error in command line" << std::endl;
+    std::cerr << "Error in command line, use -h for more info" << std::endl;
     return 1;
   }
-
 
   // Optionally, print help and exit:
   if(help) {std::cout << cli << std::endl; exit(0);}
@@ -63,10 +50,10 @@ int main(int argc,char** argv) {
   nThreads = threads;
 #endif
 
-  G4cout << "batch mode:" << batch << G4endl;
-  G4cout << "threads:" << nThreads << G4endl;
-  G4cout << "output file:" << output_file << G4endl;
-  G4cout << "macro:" << macro << G4endl;
+  G4cout << "batch mode:"   << batch        << G4endl;
+  G4cout << "threads:"      << nThreads     << G4endl;
+  G4cout << "output file:"  << output_file  << G4endl;
+  G4cout << "macro:"        << macro        << G4endl;
 
   // exit(0);
 
@@ -75,12 +62,10 @@ int main(int argc,char** argv) {
   G4UIExecutive* ui = nullptr;
   if ( ! batch ) {
     argc = 1;
-    if(argc == 1) ui = new G4UIExecutive(argc, argv);
-    // ui = new G4UIExecutive(argc, argv, session);
+    ui = new G4UIExecutive(argc, argv); // ui = new G4UIExecutive(argc, argv, session);
   }
 
-  // Optionally: choose a different Random engine...
-  // G4Random::setTheEngine(new CLHEP::MTwistEngine);
+  // Optionally: choose a different Random engine... G4Random::setTheEngine(new CLHEP::MTwistEngine);
 
   // Use G4SteppingVerboseWithUnits
   if ( verboseBestUnits ) {

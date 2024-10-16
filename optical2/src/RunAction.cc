@@ -24,13 +24,17 @@ RunAction::RunAction() {
   analysisManager->SetVerboseLevel(2);
   analysisManager->SetNtupleMerging(true);
 
+  // Book histograms, ntuple
   analysisManager->CreateH1("Nphotons" ,"Nphotons", 100, 0., 50000.);
 
-  // -mxp-
+  // Creating ntuple
+  analysisManager->CreateNtuple("Opt2", "Direction");
+  analysisManager->CreateNtupleDColumn("Xdir");
+  analysisManager->CreateNtupleDColumn("Ydir");
+  analysisManager->CreateNtupleDColumn("Zdir");
+  analysisManager->FinishNtuple();
   return;
-    // Note: merging ntuples is available only with Root output
 
-  // Book histograms, ntuple
 
   // analysisManager->CreateH1("Eabs" ,"Edep in absorber", 110, 0., 330*MeV);
   // analysisManager->CreateH1("Egap" ,"Edep in gap", 100, 0., 30*MeV);

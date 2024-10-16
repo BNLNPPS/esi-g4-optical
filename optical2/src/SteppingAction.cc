@@ -8,6 +8,8 @@
 #include "G4ParticleDefinition.hh"
 #include "G4ParticleTypes.hh"
 
+#include "G4AnalysisManager.hh"
+
 // ---
 SteppingAction::SteppingAction(const DetectorConstruction *detConstruction) : fDetConstruction(detConstruction) {}
 
@@ -28,6 +30,13 @@ void SteppingAction::UserSteppingAction(const G4Step *step)
       double y_dir = step->GetTrack()->GetMomentumDirection()[1];
       double z_dir = step->GetTrack()->GetMomentumDirection()[2];
       double energy = step->GetPostStepPoint()->GetKineticEnergy();
+
+
+      auto analysisManager = G4AnalysisManager::Instance();
+      analysisManager->FillNtupleDColumn(0, x_dir);
+      analysisManager->FillNtupleDColumn(1, y_dir);
+      analysisManager->FillNtupleDColumn(2, z_dir);
+      analysisManager->AddNtupleRow();
 
       // G4cout << "***" << energy << G4endl;
       theTrack->SetTrackStatus(fStopAndKill);
