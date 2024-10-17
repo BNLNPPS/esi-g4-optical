@@ -32,6 +32,7 @@ RunAction::RunAction() {
   analysisManager->CreateNtupleDColumn("Xdir");
   analysisManager->CreateNtupleDColumn("Ydir");
   analysisManager->CreateNtupleDColumn("Zdir");
+  analysisManager->CreateNtupleDColumn("Energy");
   analysisManager->FinishNtuple();
   return;
 
