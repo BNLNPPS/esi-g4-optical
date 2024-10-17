@@ -36,6 +36,7 @@ void SteppingAction::UserSteppingAction(const G4Step *step)
       analysisManager->FillNtupleDColumn(0, x_dir);
       analysisManager->FillNtupleDColumn(1, y_dir);
       analysisManager->FillNtupleDColumn(2, z_dir);
+      analysisManager->FillNtupleDColumn(3, energy);
       analysisManager->AddNtupleRow();
 
       // G4cout << "***" << energy << G4endl;
