@@ -1,7 +1,7 @@
-# Macro file for example B4
+# Macro file (e.g. in batch mode)
 #
 # To be run preferably in batch, without graphics:
-# % exampleB4[a,b,c,d]  -m run2.mac
+# % myExecutable -m run2.mac
 #
 # Produce Histograms and Ntuples
 #

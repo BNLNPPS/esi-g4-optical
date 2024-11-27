@@ -38,16 +38,14 @@ target_link_libraries(Opt2 ${Geant4_LIBRARIES})
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we
-# build B4b. This is so that we can run the executable directly because it
+# build the app. This is so that we can run the executable directly because it
 # relies on these scripts being in the current working directory.
 #
 set(EXAMPLEB4B_SCRIPTS
-  exampleB4b.out
-  exampleB4.in
+  example.out
+  example.in
   gui.mac
   init_vis.mac
-  plotHisto.C
-  plotNtuple.C
   run1.mac
   run2.mac
   vis.mac
