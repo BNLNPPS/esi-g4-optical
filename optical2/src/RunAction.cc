@@ -36,19 +36,6 @@ RunAction::RunAction() {
   analysisManager->FinishNtuple();
   return;
 
-
-  // analysisManager->CreateH1("Eabs" ,"Edep in absorber", 110, 0., 330*MeV);
-  // analysisManager->CreateH1("Egap" ,"Edep in gap", 100, 0., 30*MeV);
-  // analysisManager->CreateH1("Labs" ,"trackL in absorber", 100, 0., 50*cm);
-  // analysisManager->CreateH1("Lgap" ,"trackL in gap", 100, 0., 50*cm);
-  
-  // // Creating ntuple
-  // analysisManager->CreateNtuple("B4", "Edep and TrackL");
-  // analysisManager->CreateNtupleDColumn("Eabs");
-  // analysisManager->CreateNtupleDColumn("Egap");
-  // analysisManager->CreateNtupleDColumn("Labs");
-  // analysisManager->CreateNtupleDColumn("Lgap");
-  // analysisManager->FinishNtuple();
 }
 
 // ---
@@ -73,8 +60,6 @@ void RunAction::BeginOfRunAction(const G4Run* run) {
   auto analysisManager = G4AnalysisManager::Instance();
 
   // Open an output file
-  //
-  // G4String fileName = "B4.root";  // Other supported output types: csv, hdf5, xml
   analysisManager->OpenFile(_filename);
   G4cout << "##### Using " << analysisManager->GetType() << G4endl;
   G4cout << "##### FileName " << analysisManager->GetFileName() << G4endl;
