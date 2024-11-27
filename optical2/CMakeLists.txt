@@ -41,8 +41,7 @@ target_link_libraries(Opt2 ${Geant4_LIBRARIES})
 # build the app. This is so that we can run the executable directly because it
 # relies on these scripts being in the current working directory.
 #
-set(EXAMPLEB4B_SCRIPTS
-  example.out
+set(OPTICAL2_SCRIPTS
   example.in
   gui.mac
   init_vis.mac
@@ -51,7 +50,7 @@ set(EXAMPLEB4B_SCRIPTS
   vis.mac
   )
 
-foreach(_script ${EXAMPLEB4B_SCRIPTS})
+foreach(_script ${OPTICAL2_SCRIPTS})
   configure_file(
     ${PROJECT_SOURCE_DIR}/${_script}
     ${PROJECT_BINARY_DIR}/${_script}
