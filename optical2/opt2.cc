@@ -16,6 +16,9 @@
 // CLI aruments handling:
 #include "lyra.hpp"
 
+#include <julia.h>
+
+
 // -----------------------------------------------------------
 
 int main(int argc,char** argv) {

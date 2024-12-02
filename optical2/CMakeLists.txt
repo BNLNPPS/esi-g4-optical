@@ -21,7 +21,7 @@ endif()
 # Setup include directory for this project
 #
 include(${Geant4_USE_FILE})
-include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/include $ENV{JULIA_DIR}/include/julia)
 
 #----------------------------------------------------------------------------
 # Locate sources and headers for this project
@@ -35,7 +35,7 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 #
 add_executable(Opt2 opt2.cc ${sources} ${headers})
 target_link_libraries(Opt2 ${Geant4_LIBRARIES})
-
+#target_include_directories(Opt2 INTERFACE ${JULIA_DIR}/include/julia)
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we
 # build the app. This is so that we can run the executable directly because it
