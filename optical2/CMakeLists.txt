@@ -29,7 +29,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include $ENV{JULIA_DIR}/include/julia)
 # Locate sources and headers for this project
 # NB: headers are included so they will show up in IDEs
 #
-file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
+file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc ${PROJECT_SOURCE_DIR}/julia/*.jl)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 
 #----------------------------------------------------------------------------
@@ -47,6 +47,7 @@ target_link_libraries(Opt2 ${Geant4_LIBRARIES} julia)
 # relies on these scripts being in the current working directory.
 #
 set(OPTICAL2_SCRIPTS
+  julia/custom_module.jl
   example.in
   gui.mac
   init_vis.mac

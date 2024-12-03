@@ -23,6 +23,13 @@ JULIA_DEFINE_FAST_TLS
 // -----------------------------------------------------------
 
 int main(int argc,char** argv) {
+  /* required: setup the Julia context */
+  jl_init();
+
+  /* run Julia commands */
+  jl_eval_string("println(sqrt(2.0))");
+  jl_eval_string("Base.include(Main, \"./julia/custom_module.jl\")");
+
   // --mxp--: We use lyra to parse the command line:
   bool help               =   false;
   bool batch              =   false;
@@ -133,6 +140,9 @@ int main(int argc,char** argv) {
 
   delete visManager;
   delete runManager;
+
+  jl_atexit_hook(0);
+
 }
 
 // #############################################################################
