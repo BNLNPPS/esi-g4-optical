@@ -11,13 +11,14 @@
 #include "G4AnalysisManager.hh"
 
 // ---
-SteppingAction::SteppingAction(const DetectorConstruction *detConstruction) : fDetConstruction(detConstruction) {}
+SteppingAction::SteppingAction(const DetectorConstruction *detConstruction, bool analysis) : fDetConstruction(detConstruction), analysis(analysis) {}
 
 // ---
 void SteppingAction::UserSteppingAction(const G4Step *step)
 {
 
-  // -mxp- using logic in "optical1"
+  if (not analysis) {return;}
+  //
   G4Track *theTrack = step->GetTrack();
   if (theTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) {
 

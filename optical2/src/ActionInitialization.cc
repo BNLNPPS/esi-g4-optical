@@ -15,9 +15,9 @@ ActionInitialization::ActionInitialization(DetectorConstruction* detConstruction
 
 // ---
 void ActionInitialization::BuildForMaster() const {
-  RunAction* rA = new RunAction;
-  rA->SetFilename(_FileName);
+  RunAction* rA = new RunAction(_FileName);
   SetUserAction(rA);
+
   jl_eval_string("println(sqrt(2.0))");
   jl_function_t *func= jl_get_function(jl_main_module, "func");
 
@@ -38,10 +38,9 @@ void ActionInitialization::BuildForMaster() const {
 void ActionInitialization::Build() const {
   SetUserAction(new PrimaryGeneratorAction);
 
-  RunAction* rA = new RunAction;
-  rA->SetFilename(_FileName);
+  RunAction* rA = new RunAction(_FileName);
   SetUserAction(rA);
 
   SetUserAction(new EventAction);
-  SetUserAction(new SteppingAction(_DetConstruction));
+  SetUserAction(new SteppingAction(_DetConstruction, _FileName.length()>0));
 }

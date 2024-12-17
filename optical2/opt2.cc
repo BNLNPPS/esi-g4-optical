@@ -54,7 +54,11 @@ int main(int argc,char** argv) {
   bool batch              =   false;
 
   G4String macro          = "init_vis.mac";
-  G4String output_file    = "my.root";  
+  G4String output_file    = "";
+
+  //  G4cout << output_file.length() << G4endl;
+  // exit(0);
+
   int threads = 0;
 
   auto cli = lyra::cli();

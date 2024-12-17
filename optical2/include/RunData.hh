@@ -14,13 +14,6 @@ const G4int kDim = 2;
 
 ///  Run data class
 ///
-/// It defines data members to hold the energy deposit and track lengths
-/// of charged particles in Absober and Gap layers.
-///
-/// In order to reduce the number of data members a 2-dimensions array
-/// is introduced for each quantity:
-/// - fEdep[], fTrackLength[].
-///
 /// The data are collected step by step in SteppingAction, and
 /// the accumulated values are filled in histograms and a Ntuple
 /// event by event in EventAction.
@@ -47,6 +40,7 @@ public:
 private:
 
   G4int nPhotons=0;
+  bool analysis=false;
 
 
 

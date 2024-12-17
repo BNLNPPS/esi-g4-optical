@@ -6,6 +6,7 @@
 
 // ---
 void RunData::FillPerEvent() {
+  if (not analysis) {return;}
   auto analysisManager = G4AnalysisManager::Instance();
   analysisManager->FillH1(0, nPhotons);
   G4cout << "Filling H1 in RunData:" << nPhotons << G4endl;

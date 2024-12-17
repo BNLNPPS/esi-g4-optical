@@ -36,6 +36,7 @@ void EventAction::BeginOfEventAction(const G4Event* /*event*/) {
 
 // ---
 void EventAction::EndOfEventAction(const G4Event* event) {
+  //        auto analysisManager = G4AnalysisManager::Instance();
   auto runData = static_cast<RunData*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
   G4int N = runData->GetNphotons();
   G4cout << "Photons in Event:" << N << G4endl;

@@ -10,10 +10,15 @@
 // ---
 // Define print frequency, analysis manager and its verbosity
 
-RunAction::RunAction() {
+RunAction::RunAction(const G4String fn) {
+
+
+  _filename=fn;
 
   // set printing event number per each event... Mind gui.mac!
   G4RunManager::GetRunManager()->SetPrintProgress(10);
+
+  if (_filename.length()==0) { return;}
 
   // Create analysis manager.  The choice of analysis technology is done via selectin of a namespace in Analysis.hh
   auto analysisManager = G4AnalysisManager::Instance();
@@ -50,6 +55,8 @@ void RunAction::BeginOfRunAction(const G4Run* run) {
   // -mxp-
 
   G4cout << "### Run " << run->GetRunID() << " start." << G4endl;
+  if (_filename.length()==0) { return;}
+
   G4cout << "### Filename ---" << _filename << "---" << G4endl;
 
 
@@ -60,10 +67,15 @@ void RunAction::BeginOfRunAction(const G4Run* run) {
   auto analysisManager = G4AnalysisManager::Instance();
 
   // Open an output file
-  analysisManager->OpenFile(_filename);
-  G4cout << "##### Using " << analysisManager->GetType() << G4endl;
-  G4cout << "##### FileName " << analysisManager->GetFileName() << G4endl;
-  G4cout << "##### IsOpen "<< analysisManager->IsOpenFile() << G4endl;
+  if (_filename.length()>0) {
+    analysisManager->OpenFile(_filename);
+    G4cout << "##### Using " << analysisManager->GetType() << G4endl;
+    G4cout << "##### FileName " << analysisManager->GetFileName() << G4endl;
+    G4cout << "##### IsOpen "<< analysisManager->IsOpenFile() << G4endl;
+  }
+  else {
+    G4cout << "##### RunAction: no FILENAME specifed for the Analysis Manager " << G4endl;
+  }
 
   return;
 }
@@ -73,7 +85,10 @@ void RunAction::BeginOfRunAction(const G4Run* run) {
 // Note we print total number of the Cherenkov photons for now...
 
 void RunAction::EndOfRunAction(const G4Run* /*aRun*/) {
-  // --mxp--
+  //
+
+  if (_filename.length()==0) {return;}
+
   auto runData = static_cast<RunData*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
   G4int N = runData->GetNphotons();
   G4cout << "Photons " << N << G4endl;
@@ -89,39 +104,39 @@ void RunAction::EndOfRunAction(const G4Run* /*aRun*/) {
 
   // print histogram statistics
   // auto analysisManager = G4AnalysisManager::Instance();
-  if ( analysisManager->GetH1(1) ) {
-    G4cout << G4endl << " ----> print histograms statistic ";
-    if(isMaster) {
-      G4cout << "for the entire run " << G4endl << G4endl;
-    }
-    else {
-      G4cout << "for the local thread " << G4endl << G4endl;
-    }
+  // if ( analysisManager->GetH1(1) ) {
+  //   G4cout << G4endl << " ----> print histograms statistic ";
+  //   if(isMaster) {
+  //     G4cout << "for the entire run " << G4endl << G4endl;
+  //   }
+  //   else {
+  //     G4cout << "for the local thread " << G4endl << G4endl;
+  //   }
 
-    G4cout << " EAbs : mean = "
-       << G4BestUnit(analysisManager->GetH1(0)->mean(), "Energy")
-       << " rms = "
-       << G4BestUnit(analysisManager->GetH1(0)->rms(),  "Energy") << G4endl;
+  //   G4cout << " EAbs : mean = "
+  //      << G4BestUnit(analysisManager->GetH1(0)->mean(), "Energy")
+  //      << " rms = "
+  //      << G4BestUnit(analysisManager->GetH1(0)->rms(),  "Energy") << G4endl;
 
-    G4cout << " EGap : mean = "
-       << G4BestUnit(analysisManager->GetH1(1)->mean(), "Energy")
-       << " rms = "
-       << G4BestUnit(analysisManager->GetH1(1)->rms(),  "Energy") << G4endl;
+  //   G4cout << " EGap : mean = "
+  //      << G4BestUnit(analysisManager->GetH1(1)->mean(), "Energy")
+  //      << " rms = "
+  //      << G4BestUnit(analysisManager->GetH1(1)->rms(),  "Energy") << G4endl;
 
-    G4cout << " LAbs : mean = "
-      << G4BestUnit(analysisManager->GetH1(2)->mean(), "Length")
-      << " rms = "
-      << G4BestUnit(analysisManager->GetH1(2)->rms(),  "Length") << G4endl;
+  //   G4cout << " LAbs : mean = "
+  //     << G4BestUnit(analysisManager->GetH1(2)->mean(), "Length")
+  //     << " rms = "
+  //     << G4BestUnit(analysisManager->GetH1(2)->rms(),  "Length") << G4endl;
 
-    G4cout << " LGap : mean = "
-      << G4BestUnit(analysisManager->GetH1(3)->mean(), "Length")
-      << " rms = "
-      << G4BestUnit(analysisManager->GetH1(3)->rms(),  "Length") << G4endl;
-  }
+  //   G4cout << " LGap : mean = "
+  //     << G4BestUnit(analysisManager->GetH1(3)->mean(), "Length")
+  //     << " rms = "
+  //     << G4BestUnit(analysisManager->GetH1(3)->rms(),  "Length") << G4endl;
+  // }
 
-  // save histograms & ntuple
-  analysisManager->Write();
-  analysisManager->CloseFile();
+  // // save histograms & ntuple
+  // analysisManager->Write();
+  // analysisManager->CloseFile();
 
 }
 
