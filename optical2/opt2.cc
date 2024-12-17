@@ -30,16 +30,39 @@ int main(int argc,char** argv) {
   jl_eval_string("println(sqrt(2.0))");
   jl_eval_string("Base.include(Main, \"./julia/custom_module.jl\")");
 
+
+
+  // --------------------------------------------------
+  jl_eval_string("Base.include(Main, \"./custom_module.jl\")");
+  jl_eval_string("using .custom");
+  jl_function_t *func= jl_get_function(jl_main_module, "func");
+
+  if (func != NULL) {
+      printf("func is not null\n");
+  }
+  else {
+      printf("func is null\n");
+      jl_atexit_hook(0);
+      return 0;
+  }
+
+  jl_call0(func);
+
+
   // --mxp--: We use lyra to parse the command line:
   bool help               =   false;
   bool batch              =   false;
 
   G4String macro          = "init_vis.mac";
-  G4String output_file    = "my.root";  
+  G4String output_file    = "";
+
+  //  G4cout << output_file.length() << G4endl;
+  // exit(0);
+
   int threads = 0;
 
   auto cli = lyra::cli();
-  cli |= lyra::opt(output_file, "output_file")["-o"]["--output_file"]("Output file, default my.root").optional();
+  cli |= lyra::opt(output_file, "output_file")["-o"]["--output_file"]("Output file, default empty").optional();
   cli |= lyra::opt(macro,       "macro")["-m"]["--macro"]("Optional macro").optional();
   cli |= lyra::opt(batch,       "batch")["-b"]["--batch"]("Optional batch mode").optional();
   cli |= lyra::opt(threads,     "threads")["-t"]["--threads"]("Optional number of threads").optional();
