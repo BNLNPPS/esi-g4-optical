@@ -1,9 +1,9 @@
 module custom
 
-function dummy()
-    println("Hello world from dummy")
+function func()
+    println("Test function")
   end
 
-export dummy
+export func
 
 end

@@ -35,18 +35,18 @@ int main(int argc,char** argv) {
   // --------------------------------------------------
   jl_eval_string("Base.include(Main, \"./custom_module.jl\")");
   jl_eval_string("using .custom");
-  jl_function_t *dummy= jl_get_function(jl_main_module, "dummy");
+  jl_function_t *func= jl_get_function(jl_main_module, "func");
 
-  if (dummy != NULL) {
-      printf("dummy is not null\n");
+  if (func != NULL) {
+      printf("func is not null\n");
   }
   else {
-      printf("dummy is null\n");
+      printf("func is null\n");
       jl_atexit_hook(0);
       return 0;
   }
 
-  jl_call0(dummy);
+  jl_call0(func);
 
 
   // --mxp--: We use lyra to parse the command line:

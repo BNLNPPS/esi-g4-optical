@@ -15,3 +15,17 @@ In the _build_ folder, it is convenient to run:
 ```bash
 cmake ../ -B . && make -j6
 ```
+
+# Julia bindings
+
+The CMake in this project will need a setting like:
+```bash
+export JULIA_DIR=/opt/julia-1.11.2/
+```
+
+# Graphics under WSL2
+
+```bash
+export LIBGL_ALWAYS_INDIRECT=
+```
+
