@@ -4,34 +4,32 @@
 #include "G4RunManager.hh"
 #include "G4UnitsTable.hh"
 
+#include "SteppingAction.hh"
+
 // ---
+
+// RunData::RunData() {
+
+// }
+
 void RunData::FillPerEvent() {
-  if (not analysis) {return;}
+  G4cout << "Stepping action analysis: " << SteppingAction::analysis << G4endl;
+  if (not SteppingAction::analysis) {
+    G4cout << "Not Filling H1 in RunData: analysis inactive" << G4endl;
+    return;
+  }
   auto analysisManager = G4AnalysisManager::Instance();
   analysisManager->FillH1(0, nPhotons);
   G4cout << "Filling H1 in RunData:" << nPhotons << G4endl;
-
-  // // accumulate statistic  in the order of the histograms, ntuple columns declarations
-  // G4int counter = 0;
-  // for ( auto edep : fEdep ) {
-  //   analysisManager->FillH1(counter, edep);
-  //   analysisManager->FillNtupleDColumn(counter++, edep);
-  // }
-  // for ( auto trackLength : fTrackLength ) {
-  //   analysisManager->FillH1(counter, trackLength);
-  //   analysisManager->FillNtupleDColumn(counter++, trackLength);
-  // }
-  
-  // analysisManager->AddNtupleRow();
 }
 
 // ---
 
+void RunData::AddPhoton() {
+  nPhotons+=1;
+}
+
 void RunData::Reset() {
   nPhotons=0;
-
-  // for ( auto& edep : fEdep ) {edep = 0.;}
-  // for ( auto& trackLength : fTrackLength ) {trackLength = 0.;}
-
 }
 

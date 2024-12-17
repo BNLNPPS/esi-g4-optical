@@ -18,6 +18,9 @@ void ActionInitialization::BuildForMaster() const {
   RunAction* rA = new RunAction(_FileName);
   SetUserAction(rA);
 
+
+  G4cout << "Master Action output file: "  << _FileName << G4endl;  
+
   jl_eval_string("println(sqrt(2.0))");
   jl_function_t *func= jl_get_function(jl_main_module, "func");
 
@@ -40,6 +43,8 @@ void ActionInitialization::Build() const {
 
   RunAction* rA = new RunAction(_FileName);
   SetUserAction(rA);
+
+  G4cout << "Worker Action output file: "  << _FileName  << G4endl;  
 
   SetUserAction(new EventAction);
   SetUserAction(new SteppingAction(_DetConstruction, _FileName.length()>0));

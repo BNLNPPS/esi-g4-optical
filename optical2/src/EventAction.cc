@@ -5,6 +5,8 @@
 #include "G4Event.hh"
 #include "G4UnitsTable.hh"
 
+#include "G4AnalysisManager.hh"
+
 #include "Randomize.hh"
 #include <iomanip>
 
@@ -38,26 +40,14 @@ void EventAction::BeginOfEventAction(const G4Event* /*event*/) {
 void EventAction::EndOfEventAction(const G4Event* event) {
   //        auto analysisManager = G4AnalysisManager::Instance();
   auto runData = static_cast<RunData*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
+
+  auto analysisManager = G4AnalysisManager::Instance();
+
+  G4cout << "Open file:"  << analysisManager->IsOpenFile()  << G4endl;
+
   G4int N = runData->GetNphotons();
   G4cout << "Photons in Event:" << N << G4endl;
 
   runData->FillPerEvent();
-
-  // -mxp- begin comment
-  // runData->FillPerEvent();
-
-
-  // auto eventID = event->GetEventID();
-  // auto printModulo = G4RunManager::GetRunManager()->GetPrintProgress();
- 
-  // if ( ( printModulo > 0 ) && ( eventID % printModulo == 0 ) ) {
-  //   PrintEventStatistics(
-  //     runData->GetEdep(kAbs),
-  //     runData->GetTrackLength(kAbs),
-  //     runData->GetEdep(kGap),
-  //     runData->GetTrackLength(kGap));
-  //   G4cout << "--> End of event " << eventID << "\n" << G4endl;      
-  // }
-  // -mxp- end comment
 }
 

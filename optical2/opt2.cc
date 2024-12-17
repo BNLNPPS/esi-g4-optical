@@ -62,7 +62,7 @@ int main(int argc,char** argv) {
   int threads = 0;
 
   auto cli = lyra::cli();
-  cli |= lyra::opt(output_file, "output_file")["-o"]["--output_file"]("Output file, default my.root").optional();
+  cli |= lyra::opt(output_file, "output_file")["-o"]["--output_file"]("Output file, default empty").optional();
   cli |= lyra::opt(macro,       "macro")["-m"]["--macro"]("Optional macro").optional();
   cli |= lyra::opt(batch,       "batch")["-b"]["--batch"]("Optional batch mode").optional();
   cli |= lyra::opt(threads,     "threads")["-t"]["--threads"]("Optional number of threads").optional();

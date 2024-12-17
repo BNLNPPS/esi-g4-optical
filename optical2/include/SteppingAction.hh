@@ -19,9 +19,10 @@ public:
 
   void UserSteppingAction(const G4Step* step) override;
 
+  static bool analysis;
+
 private:
   const DetectorConstruction* fDetConstruction = nullptr;
-  bool analysis;
 };
 
 
