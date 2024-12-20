@@ -19,21 +19,35 @@ void ActionInitialization::BuildForMaster() const {
   SetUserAction(rA);
 
 
-  G4cout << "Master Action output file: "  << _FileName << G4endl;  
+  G4cout << "Master Action output file: "  << _FileName << " " << _FileName.size() << G4endl;  
 
   jl_eval_string("println(sqrt(2.0))");
-  jl_function_t *func= jl_get_function(jl_main_module, "func");
+  jl_function_t *test_func = jl_get_function(jl_main_module, "test_func");
 
-  if (func != NULL) {
-      printf("Action initialization -- func is not null\n");
-  }
-  else {
-      printf("Action initialization --  func is null\n");
+  if (test_func == NULL) {
+      G4cout << "Action initialization --  test_func is null, exiting..." << G4endl;      
       jl_atexit_hook(0);
       exit(0);
   }
 
-  jl_call0(func);
+  G4cout << "Calling test_func " << G4endl;
+  jl_call0(test_func);
+
+
+  jl_value_t *argument = jl_box_float64(2.0);
+  jl_function_t *operation = jl_get_function(jl_main_module, "operation");
+
+  jl_value_t *op_ret = jl_call1(operation, argument);
+
+  if (jl_typeis(op_ret, jl_float64_type)) {
+      double ret_unboxed = jl_unbox_float64(op_ret);
+      G4cout << "op_ret in C: " <<  ret_unboxed << G4endl;
+  }
+  else {
+      G4cout << "ERROR: unexpected return type from op_ret" << G4endl;
+  }
+
+
 
 }
 
@@ -49,3 +63,14 @@ void ActionInitialization::Build() const {
   SetUserAction(new EventAction);
   SetUserAction(new SteppingAction(_DetConstruction, _FileName.length()>0));
 }
+
+
+// -- ATTIC
+//   jl_value_t *ret1 = jl_call1(func, argument);
+//   if (jl_typeis(ret1, jl_float64_type)) {
+//       double ret_unboxed = jl_unbox_float64(ret1);
+//       printf("sqrt(2.0) in C: %e \n", ret_unboxed);
+//   }
+//   else {
+//       printf("ERROR: unexpected return type from sqrt(::Float64)\n");
+//   }
