@@ -40,26 +40,13 @@ int main(int argc,char** argv) {
 
   jl_eval_string("Base.include(Main, \"./julia/custom_module.jl\")"); // load the user's module
   jl_eval_string("using .custom");
-  // --------------------------------------------------
-  
-
-
 
   // --mxp--: We use lyra to parse the command line:
-  bool help               =   false;
-  bool batch              =   false;
-  bool analysis           =   false;
-
+  bool help = false; bool batch = false; bool analysis = false;
   G4String macro          = "init_vis.mac";
-  //G4String 
-  
   std::string output_file    = "";
 
-  //  G4cout << output_file.length() << G4endl;
-  // exit(0);
-
   int threads = 0;
-
   auto cli = lyra::cli() 
     | lyra::opt(output_file, "output_file")
     ["-o"]["--output_file"]
@@ -82,16 +69,11 @@ int main(int argc,char** argv) {
 
   auto result = cli.parse({ argc, argv });
 
-  if (!result) {
-    std::cerr << "Error in command line, use -h for more info" << result.message() << std::endl; //<< result.message() << std::endl;
-    return 1;
-  }
-
+  if (!result) {std::cerr << "Error in command line, use -h for more info" << result.message() << std::endl; return 1;}
   // Optionally, print help and exit:
   if(help) {std::cout << cli << std::endl; exit(0);}
 
   // exit(0);
-
 
   G4String  session;
   G4bool    verboseBestUnits = true;
@@ -217,6 +199,8 @@ int main(int argc,char** argv) {
 //       return 1;
 //     }
 //   }
+
+//<< result.message() << std::endl;
 
 
 // -- Just park this code here for reference

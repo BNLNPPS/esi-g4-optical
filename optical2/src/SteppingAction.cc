@@ -23,7 +23,6 @@ SteppingAction::SteppingAction(const DetectorConstruction *detConstruction) : fD
 // ---
 void SteppingAction::UserSteppingAction(const G4Step *step)
 {
-
   if (not Steering::analysis) {return;}
   //
   G4Track *theTrack = step->GetTrack();
@@ -51,8 +50,13 @@ void SteppingAction::UserSteppingAction(const G4Step *step)
       theTrack->SetTrackStatus(fStopAndKill);
       auto runData = static_cast<RunData*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
       runData->AddPhoton();
+    }
+
+  }
+}
 
 
+// -------------------- ATTIC
       // auto analysisManager = G4AnalysisManager::Instance();
       // if (analysisManager->IsOpenFile())
       // {
@@ -72,10 +76,6 @@ void SteppingAction::UserSteppingAction(const G4Step *step)
       runAction->AddPhoton(Photon);
       theTrack->SetTrackStatus(fStopAndKill);
       */
-    }
-
-  }
-}
 
 
   // -mxp- begin comment previous content

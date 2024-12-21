@@ -1,5 +1,8 @@
 #ifndef Steering_h
 #define Steering_h 1
+
+
+// attrinutes defined in "main"
 class Steering {
     public:
         Steering() = default;
@@ -7,7 +10,6 @@ class Steering {
         static bool callback;
 
 };
-
 
 
 #endif
