@@ -1,3 +1,7 @@
+// ---
+
+#include "Steering.hh"
+
 #include "RunData.hh"
 
 #include "G4AnalysisManager.hh"
@@ -13,8 +17,8 @@
 // }
 
 void RunData::FillPerEvent() {
-  G4cout << "Stepping action analysis: " << SteppingAction::analysis << G4endl;
-  if (not SteppingAction::analysis) {
+  G4cout << "Stepping action analysis: " << Steering::analysis << G4endl;
+  if (not Steering::analysis) {
     G4cout << "Not Filling H1 in RunData: analysis inactive" << G4endl;
     return;
   }

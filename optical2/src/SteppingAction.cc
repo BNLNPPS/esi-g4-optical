@@ -1,3 +1,7 @@
+// ---
+
+#include "Steering.hh"
+
 #include "SteppingAction.hh"
 #include "RunData.hh"
 #include "DetectorConstruction.hh"
@@ -10,22 +14,17 @@
 
 #include "G4AnalysisManager.hh"
 
-// ---
-
-
-bool SteppingAction::analysis;
-
 // --
 
-SteppingAction::SteppingAction(const DetectorConstruction *detConstruction, bool analysis) : fDetConstruction(detConstruction) {
-  SteppingAction::analysis=analysis;
+SteppingAction::SteppingAction(const DetectorConstruction *detConstruction) : fDetConstruction(detConstruction) {
+
 }
 
 // ---
 void SteppingAction::UserSteppingAction(const G4Step *step)
 {
 
-  if (not SteppingAction::analysis) {return;}
+  if (not Steering::analysis) {return;}
   //
   G4Track *theTrack = step->GetTrack();
   if (theTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) {

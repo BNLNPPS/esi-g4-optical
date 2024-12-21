@@ -1,3 +1,7 @@
+// ---
+
+#include "Steering.hh"
+
 #include "ActionInitialization.hh"
 #include "PrimaryGeneratorAction.hh"
 #include "RunAction.hh"
@@ -61,7 +65,7 @@ void ActionInitialization::Build() const {
   G4cout << "Worker Action output file: "  << _FileName  << G4endl;  
 
   SetUserAction(new EventAction);
-  SetUserAction(new SteppingAction(_DetConstruction, _FileName.length()>0));
+  SetUserAction(new SteppingAction(_DetConstruction));
 }
 
 
