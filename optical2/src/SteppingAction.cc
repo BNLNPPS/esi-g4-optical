@@ -13,7 +13,7 @@
 #include "G4ParticleTypes.hh"
 
 #include "G4AnalysisManager.hh"
-
+#include <julia.h>
 // --
 
 SteppingAction::SteppingAction(const DetectorConstruction *detConstruction) : fDetConstruction(detConstruction) {
@@ -23,6 +23,12 @@ SteppingAction::SteppingAction(const DetectorConstruction *detConstruction) : fD
 // ---
 void SteppingAction::UserSteppingAction(const G4Step *step)
 {
+
+  if(Steering::callback) {
+    jl_value_t *argument = jl_box_float64(2.0);
+
+  }
+
   if (not Steering::analysis) {return;}
   //
   G4Track *theTrack = step->GetTrack();

@@ -26,6 +26,7 @@
 
 bool Steering::analysis;
 bool Steering::callback;
+bool Steering::verbose;
 
 JULIA_DEFINE_FAST_TLS
 
@@ -42,7 +43,12 @@ int main(int argc,char** argv) {
   jl_eval_string("using .custom");
 
   // --mxp--: We use lyra to parse the command line:
-  bool help = false; bool batch = false; bool analysis = false; bool callback = false;
+  bool help       = false;
+  bool batch      = false;
+  bool analysis   = false;
+  bool callback   = false;
+  bool verbose    = false;
+
   G4String macro          = "init_vis.mac";
   std::string output_file    = "";
 
@@ -60,11 +66,15 @@ int main(int argc,char** argv) {
     | lyra::opt(batch)
     ["-b"]["--batch"]
     ("Optional batch mode").optional()
+    | lyra::opt(callback)    
     ["-c"]["--callback"]
-    ("Optional batch mode").optional()
+    ("Optional callback mode").optional()
     | lyra::opt(analysis)
     ["-a"]["--analysis"]
     ("Optional analysis mode").optional()
+    | lyra::opt(verbose)
+    ["-v"]["--verbose"]    
+    ("Verbose").optional()
     | lyra::opt(help)
     ["-h"]["--help"]
     ("Help").optional();
@@ -87,10 +97,12 @@ int main(int argc,char** argv) {
 
   Steering::analysis  = analysis;
   Steering::callback  = callback;
+  Steering::verbose   = verbose;
 
   G4cout << "Steering::analysis:"     << Steering::analysis << G4endl;
   G4cout << "batch mode:"             << batch              << G4endl;
   G4cout << "Steering::callback:"     << Steering::callback << G4endl;
+  G4cout << "Steering::verbose:"      << Steering::verbose  << G4endl;
   G4cout << "threads:"                << nThreads           << G4endl;
 
   

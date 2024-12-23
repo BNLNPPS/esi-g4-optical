@@ -17,9 +17,8 @@
 // }
 
 void RunData::FillPerEvent() {
-  G4cout << "Stepping action analysis: " << Steering::analysis << G4endl;
   if (not Steering::analysis) {
-    G4cout << "Not Filling H1 in RunData: analysis inactive" << G4endl;
+    // G4cout << "Not Filling H1 in RunData: analysis inactive" << G4endl;
     return;
   }
   auto analysisManager = G4AnalysisManager::Instance();
