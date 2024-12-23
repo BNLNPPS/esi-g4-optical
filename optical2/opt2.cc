@@ -1,3 +1,8 @@
+// ---
+
+#include "Steering.hh"
+
+// ---
 #include "DetectorConstruction.hh"
 #include "ActionInitialization.hh"
 
@@ -18,6 +23,10 @@
 
 #include <julia.h>
 
+
+bool Steering::analysis;
+bool Steering::callback;
+
 JULIA_DEFINE_FAST_TLS
 
 // -----------------------------------------------------------
@@ -27,54 +36,46 @@ int main(int argc,char** argv) {
   jl_init();
 
   /* run Julia commands */
-  jl_eval_string("println(sqrt(2.0))");
-  jl_eval_string("Base.include(Main, \"./julia/custom_module.jl\")");
+  //  jl_eval_string("println(sqrt(2.0))"); // check Julia is alive
 
-
-
-  // --------------------------------------------------
-  jl_eval_string("Base.include(Main, \"./custom_module.jl\")");
+  jl_eval_string("Base.include(Main, \"./julia/custom_module.jl\")"); // load the user's module
   jl_eval_string("using .custom");
-  jl_function_t *func= jl_get_function(jl_main_module, "func");
-
-  if (func != NULL) {
-      printf("func is not null\n");
-  }
-  else {
-      printf("func is null\n");
-      jl_atexit_hook(0);
-      return 0;
-  }
-
-  jl_call0(func);
-
 
   // --mxp--: We use lyra to parse the command line:
-  bool help               =   false;
-  bool batch              =   false;
-
+  bool help = false; bool batch = false; bool analysis = false; bool callback = false;
   G4String macro          = "init_vis.mac";
-  G4String output_file    = "";
-
-  //  G4cout << output_file.length() << G4endl;
-  // exit(0);
+  std::string output_file    = "";
 
   int threads = 0;
-
-  auto cli = lyra::cli();
-  cli |= lyra::opt(output_file, "output_file")["-o"]["--output_file"]("Output file, default empty").optional();
-  cli |= lyra::opt(macro,       "macro")["-m"]["--macro"]("Optional macro").optional();
-  cli |= lyra::opt(batch,       "batch")["-b"]["--batch"]("Optional batch mode").optional();
-  cli |= lyra::opt(threads,     "threads")["-t"]["--threads"]("Optional number of threads").optional();
+  auto cli = lyra::cli() 
+    | lyra::opt(output_file, "output_file")
+    ["-o"]["--output_file"]
+    ("Output file, default empty").optional()
+    | lyra::opt(macro, "macro")
+    ["-m"]["--macro"]
+    ("Optional macro").optional()
+    | lyra::opt(threads, "threads")
+    ["-t"]["--threads"]
+    ("Optional number of threads").optional()
+    | lyra::opt(batch)
+    ["-b"]["--batch"]
+    ("Optional batch mode").optional()
+    ["-c"]["--callback"]
+    ("Optional batch mode").optional()
+    | lyra::opt(analysis)
+    ["-a"]["--analysis"]
+    ("Optional analysis mode").optional()
+    | lyra::opt(help)
+    ["-h"]["--help"]
+    ("Help").optional();
 
   auto result = cli.parse({ argc, argv });
-  if (!result) {
-    std::cerr << "Error in command line, use -h for more info" << std::endl;
-    return 1;
-  }
 
+  if (!result) {std::cerr << "Error in command line, use -h for more info" << result.message() << std::endl; return 1;}
   // Optionally, print help and exit:
   if(help) {std::cout << cli << std::endl; exit(0);}
+
+  // exit(0);
 
   G4String  session;
   G4bool    verboseBestUnits = true;
@@ -84,9 +85,21 @@ int main(int argc,char** argv) {
   nThreads = threads;
 #endif
 
-  G4cout << "batch mode:"   << batch        << G4endl;
-  G4cout << "threads:"      << nThreads     << G4endl;
-  G4cout << "output file:"  << output_file  << G4endl;
+  Steering::analysis  = analysis;
+  Steering::callback  = callback;
+
+  G4cout << "Steering::analysis:"     << Steering::analysis << G4endl;
+  G4cout << "batch mode:"             << batch              << G4endl;
+  G4cout << "Steering::callback:"     << Steering::callback << G4endl;
+  G4cout << "threads:"                << nThreads           << G4endl;
+
+  
+  if(output_file.length()>0) {
+    G4cout << "output file:"  << output_file  << G4endl;
+  }
+  else {
+    G4cout << "output file not specified" << G4endl;
+  }
   G4cout << "macro:"        << macro        << G4endl;
 
   // exit(0);
@@ -123,13 +136,11 @@ int main(int argc,char** argv) {
 
   auto physicsList = new FTFP_BERT(0);
 
-  // make optics works
-  physicsList->ReplacePhysics(new G4EmStandardPhysics_option4());
-
+  // set up optics -- note that "0" in the following line really helps to reduce output,
+  // which is otherwise pretty massive.
+  physicsList->ReplacePhysics(new G4EmStandardPhysics_option4(0));
   auto opticalPhysics = new G4OpticalPhysics();
   physicsList->RegisterPhysics(opticalPhysics);
-
-  // ---
   runManager->SetUserInitialization(physicsList);
 
   auto actionInitialization = new ActionInitialization(detConstruction, output_file);
@@ -164,9 +175,11 @@ int main(int argc,char** argv) {
   delete visManager;
   delete runManager;
 
-  jl_atexit_hook(0);
+  jl_atexit_hook(0); // exit Julia
 
 }
+
+
 
 // #############################################################################
 // The old CLI UI, kept for reference only
@@ -189,3 +202,12 @@ int main(int argc,char** argv) {
 //       return 1;
 //     }
 //   }
+
+//<< result.message() << std::endl;
+
+
+// -- Just park this code here for reference
+// jl_function_t *test_func= jl_get_function(jl_main_module, "test_func");
+// if (test_func != NULL) {printf("test_func is not null\n");}
+// else {printf("test_func is null\n"); jl_atexit_hook(0); return 0;}
+// jl_call0(test_func);

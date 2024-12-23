@@ -1,9 +1,17 @@
 module custom
 
-function func()
+# ---
+function test_func()
     println("Test function")
   end
 
-export func
+# ---
+function operation(x::Float64)
+    x*2.0
+end
+
+
+# ---
+export test_func, operation
 
 end

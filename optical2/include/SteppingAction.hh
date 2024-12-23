@@ -5,21 +5,13 @@
 
 class DetectorConstruction;
 
-/// Stepping action class.
-///
-/// In UserSteppingAction() there are collected the energy deposit and track
-/// lengths of charged particles in Absober and Gap layers and
-/// updated in RunData object.
 
-class SteppingAction : public G4UserSteppingAction
-{
+class SteppingAction : public G4UserSteppingAction {
 public:
-  SteppingAction(const DetectorConstruction* detConstruction, bool analysis=true);
+  SteppingAction(const DetectorConstruction* detConstruction);
   ~SteppingAction() override = default;
 
   void UserSteppingAction(const G4Step* step) override;
-
-  static bool analysis;
 
 private:
   const DetectorConstruction* fDetConstruction = nullptr;

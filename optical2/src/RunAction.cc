@@ -49,8 +49,6 @@ G4Run* RunAction::GenerateRun() {
 // ---
 
 void RunAction::BeginOfRunAction(const G4Run* run) {
-  // -mxp-
-
   G4cout << "### Run " << run->GetRunID() << " start." << G4endl;
   if (_filename.length()==0) { return;}
 
@@ -66,9 +64,9 @@ void RunAction::BeginOfRunAction(const G4Run* run) {
   // Open an output file
   if (_filename.length()>0) {
     analysisManager->OpenFile(_filename);
-    G4cout << "##### Using " << analysisManager->GetType() << G4endl;
+    G4cout << "##### Using "    << analysisManager->GetType()     << G4endl;
     G4cout << "##### FileName " << analysisManager->GetFileName() << G4endl;
-    G4cout << "##### IsOpen "<< analysisManager->IsOpenFile() << G4endl;
+    G4cout << "##### IsOpen "   << analysisManager->IsOpenFile()  << G4endl;
   }
   else {
     G4cout << "##### RunAction: no FILENAME specifed for the Analysis Manager " << G4endl;
@@ -78,15 +76,9 @@ void RunAction::BeginOfRunAction(const G4Run* run) {
 }
 
 // ---
-
-// Note we print total number of the Cherenkov photons for now...
-
 void RunAction::EndOfRunAction(const G4Run* /*aRun*/) {
-  //
 
   if (_filename.length()==0) {return;}
-
-
   G4cout << "+++++++++++++++++++++++++++++++ END OF RUN ++++++++++++++++++++++++++++++++++++++++++++++";
 
   auto runData = static_cast<RunData*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());

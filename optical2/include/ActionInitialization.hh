@@ -6,8 +6,7 @@
 
 class DetectorConstruction;
 
-/// Action initialization class.
-
+// ---
 class ActionInitialization : public G4VUserActionInitialization {
   public:
     ActionInitialization(DetectorConstruction*, G4String fn);

@@ -1,5 +1,12 @@
 # optical2
 
+
+## ActionInitialization
+
+There are two methods, `Build` and `BuildForMaster`, reflecting the difference
+between threads. This is important to ensure procedures like _NTuple_ merging
+and others work correctly.
+
 ## EventAction and RunData
 
 In the beginning of each event, the photon counter is reset to zero.
