@@ -1,0 +1,11 @@
+# Initialize kernel
+/run/initialize
+#
+/control/verbose 0
+/tracking/verbose 0
+# muon 300 MeV in direction (0.,0.,1.)
+/gun/particle mu+
+/gun/energy 300 MeV
+#
+/run/beamOn 1
+

@@ -42,7 +42,7 @@ int main(int argc,char** argv) {
   jl_eval_string("using .custom");
 
   // --mxp--: We use lyra to parse the command line:
-  bool help = false; bool batch = false; bool analysis = false;
+  bool help = false; bool batch = false; bool analysis = false; bool callback = false;
   G4String macro          = "init_vis.mac";
   std::string output_file    = "";
 
@@ -59,6 +59,8 @@ int main(int argc,char** argv) {
     ("Optional number of threads").optional()
     | lyra::opt(batch)
     ["-b"]["--batch"]
+    ("Optional batch mode").optional()
+    ["-c"]["--callback"]
     ("Optional batch mode").optional()
     | lyra::opt(analysis)
     ["-a"]["--analysis"]
@@ -84,10 +86,13 @@ int main(int argc,char** argv) {
 #endif
 
   Steering::analysis  = analysis;
+  Steering::callback  = callback;
 
-  G4cout << "Steering::analysis :"   << Steering::analysis << G4endl;
-  G4cout << "batch mode:"   << batch        << G4endl;
-  G4cout << "threads:"      << nThreads     << G4endl;
+  G4cout << "Steering::analysis:"     << Steering::analysis << G4endl;
+  G4cout << "batch mode:"             << batch              << G4endl;
+  G4cout << "Steering::callback:"     << Steering::callback << G4endl;
+  G4cout << "threads:"                << nThreads           << G4endl;
+
   
   if(output_file.length()>0) {
     G4cout << "output file:"  << output_file  << G4endl;
@@ -131,13 +136,11 @@ int main(int argc,char** argv) {
 
   auto physicsList = new FTFP_BERT(0);
 
-  // make optics works
-  physicsList->ReplacePhysics(new G4EmStandardPhysics_option4());
-
+  // set up optics -- note that "0" in the following line really helps to reduce output,
+  // which is otherwise pretty massive.
+  physicsList->ReplacePhysics(new G4EmStandardPhysics_option4(0));
   auto opticalPhysics = new G4OpticalPhysics();
   physicsList->RegisterPhysics(opticalPhysics);
-
-  // ---
   runManager->SetUserInitialization(physicsList);
 
   auto actionInitialization = new ActionInitialization(detConstruction, output_file);
