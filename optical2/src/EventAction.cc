@@ -1,3 +1,7 @@
+// ---
+
+#include "Steering.hh"
+
 #include "EventAction.hh"
 #include "RunData.hh"
 
@@ -43,10 +47,12 @@ void EventAction::EndOfEventAction(const G4Event* event) {
 
   auto analysisManager = G4AnalysisManager::Instance();
 
-  G4cout << "Open file:"  << analysisManager->IsOpenFile()  << G4endl;
+  // G4cout << "Open file:"  << analysisManager->IsOpenFile()  << G4endl;
 
-  G4int N = runData->GetNphotons();
-  G4cout << "Photons in Event:" << N << G4endl;
+  if(Steering::verbose) {
+    G4int N = runData->GetNphotons();
+    G4cout << "Photons in Event:" << N << G4endl;
+  }
 
   runData->FillPerEvent();
 }

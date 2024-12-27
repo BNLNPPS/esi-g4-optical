@@ -13,6 +13,10 @@
 #include "G4UIExecutive.hh"
 #include "G4VisExecutive.hh"
 #include "Randomize.hh"
+
+// Keep here temporarily
+#include "G4UserWorkerInitialization.hh"
+
 // important for optical
 #include "G4EmStandardPhysics_option4.hh"
 #include "G4OpticalPhysics.hh"
@@ -26,8 +30,26 @@
 
 bool Steering::analysis;
 bool Steering::callback;
+bool Steering::verbose;
 
-JULIA_DEFINE_FAST_TLS
+JULIA_DEFINE_FAST_TLS // only define this once, in an executable
+
+
+class WorkerInitialization : public G4UserWorkerInitialization {
+  public:
+    WorkerInitialization() = default;
+    virtual ~WorkerInitialization() = default;
+    virtual void WorkerInitialize() const override {
+      if (jl_get_pgcstack() == NULL) jl_adopt_thread();
+    }
+    virtual void WorkerStart() const override {}
+    virtual void WorkerRunStart() const override {}
+    virtual void WorkerRunEnd() const override {
+      jl_ptls_t ptls = jl_current_task->ptls;
+      jl_gc_safe_enter(ptls);
+    }
+    virtual void WorkerStop() const override {}
+};
 
 // -----------------------------------------------------------
 
@@ -42,11 +64,17 @@ int main(int argc,char** argv) {
   jl_eval_string("using .custom");
 
   // --mxp--: We use lyra to parse the command line:
-  bool help = false; bool batch = false; bool analysis = false; bool callback = false;
+  bool help       = false;
+  bool batch      = false;
+  bool analysis   = false;
+  bool callback   = false;
+  bool verbose    = false;
+
   G4String macro          = "init_vis.mac";
   std::string output_file    = "";
 
   int threads = 0;
+
   auto cli = lyra::cli() 
     | lyra::opt(output_file, "output_file")
     ["-o"]["--output_file"]
@@ -60,11 +88,15 @@ int main(int argc,char** argv) {
     | lyra::opt(batch)
     ["-b"]["--batch"]
     ("Optional batch mode").optional()
+    | lyra::opt(callback)    
     ["-c"]["--callback"]
-    ("Optional batch mode").optional()
+    ("Optional callback mode").optional()
     | lyra::opt(analysis)
     ["-a"]["--analysis"]
     ("Optional analysis mode").optional()
+    | lyra::opt(verbose)
+    ["-v"]["--verbose"]    
+    ("Verbose").optional()
     | lyra::opt(help)
     ["-h"]["--help"]
     ("Help").optional();
@@ -79,18 +111,17 @@ int main(int argc,char** argv) {
 
   G4String  session;
   G4bool    verboseBestUnits = true;
+  G4int     nThreads  = threads;
 
-  G4int nThreads = 0;
-#ifdef G4MULTITHREADED
-  nThreads = threads;
-#endif
 
   Steering::analysis  = analysis;
   Steering::callback  = callback;
+  Steering::verbose   = verbose;
 
   G4cout << "Steering::analysis:"     << Steering::analysis << G4endl;
   G4cout << "batch mode:"             << batch              << G4endl;
   G4cout << "Steering::callback:"     << Steering::callback << G4endl;
+  G4cout << "Steering::verbose:"      << Steering::verbose  << G4endl;
   G4cout << "threads:"                << nThreads           << G4endl;
 
   
@@ -120,8 +151,18 @@ int main(int argc,char** argv) {
     G4SteppingVerbose::UseBestUnit(precision);
   }
 
-  // Construct the default run manager
-  auto runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
+  // ------------------ RUN MANAGER -----------------------------------
+  G4RunManager* runManager;
+
+  if (nThreads > 0) { 
+    runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::MT);
+    runManager->SetNumberOfThreads(nThreads);
+    runManager->SetUserInitialization(new WorkerInitialization());
+  } else {
+    runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Serial);
+  }
+
+  // auto runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
   runManager->SetVerboseLevel(0);
 #ifdef G4MULTITHREADED
   if ( nThreads > 0 ) {
