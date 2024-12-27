@@ -4,8 +4,9 @@
 ## ActionInitialization
 
 There are two methods, `Build` and `BuildForMaster`, reflecting the difference
-between threads. This is important to ensure procedures like _NTuple_ merging
-and others work correctly.
+between threads. This is important for two reasons:
+* to ensure procedures like _NTuple_ merging and others work correctly
+* to handle special cases like _Julia callbacks_
 
 ## EventAction and RunData
 

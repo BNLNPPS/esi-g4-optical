@@ -13,6 +13,10 @@
 #include "G4UIExecutive.hh"
 #include "G4VisExecutive.hh"
 #include "Randomize.hh"
+
+// Keep here temporarily
+#include "G4UserWorkerInitialization.hh"
+
 // important for optical
 #include "G4EmStandardPhysics_option4.hh"
 #include "G4OpticalPhysics.hh"
@@ -28,7 +32,24 @@ bool Steering::analysis;
 bool Steering::callback;
 bool Steering::verbose;
 
-JULIA_DEFINE_FAST_TLS
+JULIA_DEFINE_FAST_TLS // only define this once, in an executable
+
+
+class WorkerInitialization : public G4UserWorkerInitialization {
+  public:
+    WorkerInitialization() = default;
+    virtual ~WorkerInitialization() = default;
+    virtual void WorkerInitialize() const override {
+      if (jl_get_pgcstack() == NULL) jl_adopt_thread();
+    }
+    virtual void WorkerStart() const override {}
+    virtual void WorkerRunStart() const override {}
+    virtual void WorkerRunEnd() const override {
+      jl_ptls_t ptls = jl_current_task->ptls;
+      jl_gc_safe_enter(ptls);
+    }
+    virtual void WorkerStop() const override {}
+};
 
 // -----------------------------------------------------------
 
@@ -53,6 +74,7 @@ int main(int argc,char** argv) {
   std::string output_file    = "";
 
   int threads = 0;
+
   auto cli = lyra::cli() 
     | lyra::opt(output_file, "output_file")
     ["-o"]["--output_file"]
@@ -89,11 +111,8 @@ int main(int argc,char** argv) {
 
   G4String  session;
   G4bool    verboseBestUnits = true;
+  G4int     nThreads  = threads;
 
-  G4int nThreads = 0;
-#ifdef G4MULTITHREADED
-  nThreads = threads;
-#endif
 
   Steering::analysis  = analysis;
   Steering::callback  = callback;
@@ -132,8 +151,18 @@ int main(int argc,char** argv) {
     G4SteppingVerbose::UseBestUnit(precision);
   }
 
-  // Construct the default run manager
-  auto runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
+  // ------------------ RUN MANAGER -----------------------------------
+  G4RunManager* runManager;
+
+  if (nThreads > 0) { 
+    runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::MT);
+    runManager->SetNumberOfThreads(nThreads);
+    runManager->SetUserInitialization(new WorkerInitialization());
+  } else {
+    runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Serial);
+  }
+
+  // auto runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
   runManager->SetVerboseLevel(0);
 #ifdef G4MULTITHREADED
   if ( nThreads > 0 ) {

@@ -16,16 +16,18 @@
 #include <julia.h>
 // --
 
-SteppingAction::SteppingAction(const DetectorConstruction *detConstruction) : fDetConstruction(detConstruction) {
 
+SteppingAction::SteppingAction(const DetectorConstruction *detConstruction) : fDetConstruction(detConstruction) {
+  action_jl = (stepaction_f)(jl_unbox_voidpointer(jl_eval_string("@cfunction(stepping_action, Nothing, (CxxPtr{G4Step},))")));
+  std::cout << "=====> " << action_jl << std::endl;
 }
 
 // ---
 void SteppingAction::UserSteppingAction(const G4Step *step)
 {
-
+  action_jl(step);
   if(Steering::callback) {
-    jl_value_t *argument = jl_box_float64(2.0);
+    // jl_value_t *argument = jl_box_float64(2.0);
 
   }
 

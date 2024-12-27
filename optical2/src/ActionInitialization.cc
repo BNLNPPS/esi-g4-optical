@@ -77,6 +77,7 @@ void ActionInitialization::Build() const {
   
 
   SetUserAction(new EventAction);
+  // NB. this is only in the worker thread:
   SetUserAction(new SteppingAction(_DetConstruction));
 }
 
