@@ -49,9 +49,9 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 {
 
    
-            G4ThreeVector position_mm(0., 0., 0.);
+            G4ThreeVector position_mm(1000*mm, 100*mm, 0.);
             G4double time_ns = 0.;
-            G4ThreeVector direction(1., 0., 0.);
+            G4ThreeVector direction(-0.9, -0.1, 0.);
             // direction = direction.unit();
             G4double wavelength_nm = 400.;
             G4ThreeVector polarization(1., 0., 0.);
