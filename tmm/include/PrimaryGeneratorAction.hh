@@ -6,6 +6,7 @@
 
 
 #include "G4ParticleGun.hh" // class G4ParticleGun;
+#include "G4OpticalPhoton.hh" // class G4ParticleGun;
 class G4GenericMessenger;
 class G4Event;
 class G4ParticleDefinition;
@@ -51,6 +52,8 @@ private:
     G4ParticleDefinition* fPion;
     G4ParticleDefinition* fKaon;
     G4ParticleDefinition* fProton;
+    G4OpticalPhoton* fPhoton;
+
     G4double fMomentum;
     G4double fSigmaMomentum;
     G4double fSigmaAngle;

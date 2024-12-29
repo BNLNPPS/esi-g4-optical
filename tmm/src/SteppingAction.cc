@@ -19,14 +19,16 @@ SteppingAction::~SteppingAction(){}
 void SteppingAction::UserSteppingAction(const G4Step* step) {
 
     G4Track* theTrack = step->GetTrack();
+   
+   /*
     if(theTrack->GetDefinition()==G4OpticalPhoton::OpticalPhotonDefinition()) {
         if(theTrack->GetCreatorProcess()->GetProcessName()=="Cerenkov") {
             //  auto runAction = static_cast<RunAction*>(G4MTRunManager::GetMasterRunManager()->GetUserRunAction());
 
-            /*
-            if (runAction) {G4cout << "RunAction pointer OK" << G4endl;}
-            else      {     G4cerr << "RunAction is not available or not of type RunAction." << G4endl; }
-            */
+            
+            // if (runAction) {G4cout << "RunAction pointer OK" << G4endl;}
+            // else      {     G4cerr << "RunAction is not available or not of type RunAction." << G4endl; }
+            
 
             double x = step->GetPostStepPoint()->GetPosition().x();
             double y = step->GetPostStepPoint()->GetPosition().y();
@@ -49,13 +51,14 @@ void SteppingAction::UserSteppingAction(const G4Step* step) {
                 analysisManager->AddNtupleRow();
             }
 
-            /*
-            std::vector<double> Photon = {x, y, z, x_dir, y_dir, z_dir, energy};
-            runAction->AddPhoton(Photon);
-            theTrack->SetTrackStatus(fStopAndKill);
-            */
+          
+           // std::vector<double> Photon = {x, y, z, x_dir, y_dir, z_dir, energy};
+           // runAction->AddPhoton(Photon);
+           // theTrack->SetTrackStatus(fStopAndKill);
+            
 
         }
     }
 
+   */
 }

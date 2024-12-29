@@ -7,7 +7,8 @@
 #include "G4GenericMessenger.hh"
 #include "G4SystemOfUnits.hh"
 #include "Randomize.hh"
-
+#include "G4SystemOfUnits.hh"
+#include "G4PhysicalConstants.hh"
 // ---
 
 PrimaryGeneratorAction::PrimaryGeneratorAction(): G4VUserPrimaryGeneratorAction(),     
@@ -29,11 +30,7 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(): G4VUserPrimaryGeneratorAction(
     fPion       = particleTable->FindParticle(particleName="pi+");
     fKaon       = particleTable->FindParticle(particleName="kaon+");
     fProton     = particleTable->FindParticle(particleName="proton");
-    
-    // default particle kinematics
-    fParticleGun->SetParticlePosition(G4ThreeVector(0.,0.,-10.*cm));
-    fParticleGun->SetParticleDefinition(fProton);
-    
+
     // define commands for this class
     DefineCommands();
 }
@@ -50,46 +47,26 @@ PrimaryGeneratorAction::~PrimaryGeneratorAction()
 
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 {
-    G4ParticleDefinition* particle;
+
+   
+            G4ThreeVector position_mm(0., 0., 0.);
+            G4double time_ns = 0.;
+            G4ThreeVector direction(1., 0., 0.);
+            // direction = direction.unit();
+            G4double wavelength_nm = 400.;
+            G4ThreeVector polarization(1., 0., 0.);
+
+            G4PrimaryVertex *vertex = new G4PrimaryVertex(position_mm, time_ns);
+            G4double kineticEnergy = h_Planck * c_light / (wavelength_nm * nm);
+    G4PrimaryParticle *particle = new G4PrimaryParticle(G4OpticalPhoton::Definition());
+
+    particle->SetKineticEnergy(kineticEnergy);
+    particle->SetMomentumDirection(direction);
+    particle->SetPolarization(polarization);
     
-    if (fRandomizePrimary)
-    {
-        G4int i = (int)(5.*G4UniformRand());
-        switch(i)
-        {
-            case 0:
-                particle = fPositron;
-                break;
-            case 1:
-                particle = fMuon;
-                break;
-            case 2:
-                particle = fPion;
-                break;
-            case 3:
-                particle = fKaon;
-                break;
-            default:
-                particle = fProton;
-                break;
-        }
-        fParticleGun->SetParticleDefinition(particle);
-    }
-    else
-    {
-        particle = fParticleGun->GetParticleDefinition();
-    }
+    vertex->SetPrimary(particle);
+    event->AddPrimaryVertex(vertex);
     
-    G4double pp = fMomentum + (G4UniformRand()-0.5)*fSigmaMomentum;
-    G4double mass = particle->GetPDGMass();
-    G4double Ekin = std::sqrt(pp*pp+mass*mass)-mass;
-    fParticleGun->SetParticleEnergy(Ekin);
-    
-    G4double angle = (G4UniformRand()-0.5)*fSigmaAngle;
-    fParticleGun->SetParticleMomentumDirection(G4ThreeVector(std::sin(angle),0.,
-                                                             std::cos(angle)));
-    
-    fParticleGun->GeneratePrimaryVertex(event);
 }
 
 // ---

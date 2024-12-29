@@ -1,6 +1,8 @@
 #----------------------------------------------------------------------------
 # Setup the project
 cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
+
+set(CMAKE_BUILD_TYPE Debug) # Ensure the build type is Debug
 project(Opt)
 
 #----------------------------------------------------------------------------
