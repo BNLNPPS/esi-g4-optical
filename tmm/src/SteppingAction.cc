@@ -20,7 +20,17 @@ SteppingAction::~SteppingAction(){}
 void SteppingAction::UserSteppingAction(const G4Step* step) {
 
     G4Track* theTrack = step->GetTrack();
+
+    // need to understand this: examples/Geant4/BoundaryStandalone/G4OpBoundaryProcess_MOCK.cc
    
+    // check if entering window
+
+    // get the incident angle
+
+    // get the wavelength
+
+    // check if abs, reflection or transmittance
+        // if abs, kill, if trans, count and if refl just let G4 do it
 
 
     // Use double precision and 2 layers
