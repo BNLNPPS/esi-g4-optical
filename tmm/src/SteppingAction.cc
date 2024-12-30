@@ -22,8 +22,22 @@ void SteppingAction::UserSteppingAction(const G4Step* step) {
     G4Track* theTrack = step->GetTrack();
    
 
-    StackSpec<double, 2> ss = StackSpec<double,2>::Create2(1.0f, 1.5f);
+
+    // Use double precision and 2 layers
+    StackSpec<double, 2> ss;
     double wavelength_nm = 500.0;
+
+    // 1) Photocathode layer (Layer 0)
+    ss.ls[0].nr = 1.90;     // real index
+    ss.ls[0].ni = 0.10;     // imaginary index (some absorption)
+    ss.ls[0].d  = 300.0;    // thickness in nm (example)    double wavelength_nm = 500.0;
+    
+
+    // 2) Plexiglass layer (Layer 1)
+    ss.ls[1].nr = 1.49;     // real index
+    ss.ls[1].ni = 0.00;     // imaginary index (no absorption)
+    ss.ls[1].d  = 10000.0;    // thickness in nm (example)
+
     double minus_cos_theta = -1.0;
     Stack<double, 2> stack(wavelength_nm, minus_cos_theta, ss);
     std::cout << stack << std::endl;
