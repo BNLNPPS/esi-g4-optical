@@ -6,6 +6,7 @@
 #include "G4LogicalVolume.hh"
 #include "G4Track.hh"
 #include "RunAction.hh"
+#include "tmm.h"
 #include "G4AnalysisManager.hh"
 
 #include "G4ParticleDefinition.hh"
@@ -20,6 +21,21 @@ void SteppingAction::UserSteppingAction(const G4Step* step) {
 
     G4Track* theTrack = step->GetTrack();
    
+
+    StackSpec<double, 2> ss = StackSpec<double,2>::Create2(1.0f, 1.5f);
+    double wavelength_nm = 500.0;
+    double minus_cos_theta = -1.0;
+    Stack<double, 2> stack(wavelength_nm, minus_cos_theta, ss);
+    std::cout << stack << std::endl;
+    
+    std::cout << "Final Reflectance (S): " << stack.art.R_s << std::endl;
+    std::cout << "Final Reflectance (P): " << stack.art.R_p << std::endl;
+    std::cout << "Final Transmittance (S): " << stack.art.T_s << std::endl;
+    std::cout << "Final Transmittance (P): " << stack.art.T_p << std::endl;
+    std::cout << "Final Absorption (S): " << stack.art.A_s << std::endl;
+    std::cout << "Final Absorption (P): " << stack.art.A_p << std::endl;
+
+
    /*
     if(theTrack->GetDefinition()==G4OpticalPhoton::OpticalPhotonDefinition()) {
         if(theTrack->GetCreatorProcess()->GetProcessName()=="Cerenkov") {
