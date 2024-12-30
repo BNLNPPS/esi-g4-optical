@@ -1,32 +1,5 @@
 #pragma once
 /**
-stmm.h : Thin/Thick Multi-layer Stack TMM "Transfer Matrix Method" A,R,T calculation 
-======================================================================================
-
-CAUTION : probably divergence from ~/j/Layr/JPMT.h 
-
-Developed in ~/j/Layr/Layr.h, moved into syrap to assist with comparison
-with qsim.h propagate_at_boundary 
-
-
-1. nothing JUNO specific here
-2. header-only implementation, installed with j/PMTSim 
-
-See Also
------------
-
-Layr.rst 
-    notes/refs on TMM theory and CPU+GPU implementation 
-
-LayrTest.{h,cc,cu,py,sh} 
-    build, run cpu+gpu scans, plotting, comparisons float/double cpu/gpu std/thrust 
-
-JPMT.h
-    JUNO specific collection of PMT rindex and thickness into arrays 
-
-
-Contents of Layr.h : (persisted array shapes)
-----------------------------------------------
 
 namespace Const 
     templated constexpr functions: zero, one, two, pi, twopi
