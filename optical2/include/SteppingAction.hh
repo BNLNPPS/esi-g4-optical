@@ -5,7 +5,10 @@
 
 class DetectorConstruction;
 
-typedef  void (*stepaction_f)(const G4Step*);
+#include <julia.h>
+
+// typedef  void (*stepaction_f)(const G4Step*);
+// typedef  void (*stepaction_f)(const G4Step*);
 
 
 class SteppingAction : public G4UserSteppingAction {
@@ -18,7 +21,8 @@ public:
 
 private:
   const DetectorConstruction* fDetConstruction = nullptr;
-  stepaction_f action_jl;
+  // stepaction_f action_jl=NULL;
+    jl_function_t * action_jl=NULL;
 };
 
 

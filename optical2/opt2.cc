@@ -40,10 +40,26 @@ class WorkerInitialization : public G4UserWorkerInitialization {
     WorkerInitialization() = default;
     virtual ~WorkerInitialization() = default;
     virtual void WorkerInitialize() const override {
-      if (jl_get_pgcstack() == NULL) jl_adopt_thread();
+      if (jl_get_pgcstack() == NULL) {
+      jl_adopt_thread();
+      std::cout << "=====> WORKER INIT, THREAD ADOPTED <===========" << std::endl;
+      }
     }
     virtual void WorkerStart() const override {}
-    virtual void WorkerRunStart() const override {}
+    virtual void WorkerRunStart() const override {
+      std::cout << "=====> WORKER RUN START <===========" << std::endl;
+      //jl_eval_string("println(sqrt(2.0))");
+      jl_function_t *test_func = jl_get_function(jl_main_module, "test_func");
+      if (test_func == NULL) {
+        G4cout << "Worker run start --  test_func is null, exiting..." << G4endl;      
+        jl_atexit_hook(0);
+        exit(0);
+      }
+    G4cout << "Calling test_func " << G4endl;
+    jl_call0(test_func);      
+
+    }
+
     virtual void WorkerRunEnd() const override {
       jl_ptls_t ptls = jl_current_task->ptls;
       jl_gc_safe_enter(ptls);
@@ -164,11 +180,11 @@ int main(int argc,char** argv) {
 
   // auto runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
   runManager->SetVerboseLevel(0);
-#ifdef G4MULTITHREADED
-  if ( nThreads > 0 ) {
-    runManager->SetNumberOfThreads(nThreads);
-  }
-#endif
+// #ifdef G4MULTITHREADED
+  // if ( nThreads > 0 ) {
+  //   runManager->SetNumberOfThreads(nThreads);
+  // }
+//#endif
 
   // Set mandatory initialization classes
   //
