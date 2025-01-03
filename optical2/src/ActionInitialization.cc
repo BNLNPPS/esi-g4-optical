@@ -12,14 +12,14 @@
 
 #include <julia.h>
 
-// JULIA_DEFINE_FAST_TLS
+// JULIA_DEFINE_FAST_TLS -- no need to define here, we do it in the "main" now, only need once.
 
 // ---
 ActionInitialization::ActionInitialization(DetectorConstruction* detConstruction, G4String fn):_DetConstruction(detConstruction), _FileName(fn) {};
 
-// ---
+// --- MASTER
 void ActionInitialization::BuildForMaster() const {
-  RunAction* rA = new RunAction(_FileName);
+  RunAction*    rA = new RunAction(_FileName);
   SetUserAction(rA);
 
   if(_FileName.length()>0) {
@@ -29,6 +29,10 @@ void ActionInitialization::BuildForMaster() const {
     G4cout << "Master: output file not specified" << G4endl;
   }
 
+
+    // jl_eval_string("println(sqrt(2.0))");
+    // jl_function_t *test_func = jl_get_function(jl_main_module, "test_func");
+    // jl_call0(test_func);
 
   if(Steering::callback) {
     jl_eval_string("println(sqrt(2.0))");
@@ -61,7 +65,7 @@ void ActionInitialization::BuildForMaster() const {
 
 }
 
-// ---
+// --- WORKER
 void ActionInitialization::Build() const {
   SetUserAction(new PrimaryGeneratorAction);
 

@@ -14,12 +14,13 @@ In the beginning of each event, the photon counter is reset to zero.
 
 ## SteppingAction and RunData
 
-`SteppingAction` kills the Cherenkov photon and calls `RunData` to increment the photon counter.
+* `SteppingAction` kills the Cherenkov photon and calls `RunData` to increment the photon counter.
+* Experimental -- adding Julia callbacks to `SteppingAction`
 
 
 ## RunAction
 
-Calls _Analysis Manager_ to open the file.
+Calls _Analysis Manager_ to open the file. May contain Julia callbacks for general testing.
 
 
 ---
