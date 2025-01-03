@@ -22,7 +22,7 @@ SteppingAction::SteppingAction(const DetectorConstruction *detConstruction) : fD
   // action_jl = (stepaction_f)(jl_unbox_voidpointer(jl_eval_string("@cfunction(stepping_action, Nothing, (CxxPtr{G4Step},))")));
   // std::cout << "=====> " << action_jl << std::endl;
 
-  action_jl = jl_get_function(jl_main_module, "test_func");
+  action_jl = jl_get_function(jl_main_module, "opvoid");
   if (action_jl == NULL) {
       G4cout << "Stepping Action ctor --  action_jl is null, exiting..." << G4endl;      
       jl_atexit_hook(0);
@@ -33,11 +33,15 @@ SteppingAction::SteppingAction(const DetectorConstruction *detConstruction) : fD
 // ---
 void SteppingAction::UserSteppingAction(const G4Step *step)
 {
+
   // action_jl(step);
   if(Steering::callback) {
+    jl_value_t *argument = jl_box_float64(2.0);
+    jl_value_t *op_ret = jl_call1(action_jl, argument);
+
     // action_jl();
     //jl_call0(action_jl);
-    jl_eval_string("println(sqrt(2.0))");
+    // jl_eval_string("println(sqrt(2.0))");
     // jl_value_t *argument = jl_box_float64(2.0);
 
   }

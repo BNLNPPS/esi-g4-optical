@@ -7,5 +7,5 @@
 /gun/particle mu+
 /gun/energy 300 MeV
 #
-/run/beamOn 200
+/run/beamOn 240
 
