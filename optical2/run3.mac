@@ -9,5 +9,5 @@
 #
 # Only need this if accidentally overwrote in the code
 # /run/printProgress 0
-/run/beamOn 10000
+/run/beamOn 1000
 

@@ -1,5 +1,11 @@
 module custom
 
+# - future dev
+mutable struct Foo
+  x::Float32
+end
+
+
 # ---
 function test_func()
     # println("Test function")
@@ -19,15 +25,27 @@ function opvoid(x::Float64)
 end
 
 
-# ---
-mutable struct Foo
-  x::Float32
-end
-
+# # - future dev
 # ---
 function opstruct(x::Foo)
   return
 end
+
+
+function opstruct(t::Foo, v::Float64)
+println("!!!")
+t.x=v
+println(t.x)
+return
+end
+
+function newstruct()
+println("new")
+y = Foo(1.0)
+return y
+end
+
+
 
 # ---
 export test_func, operation, opvoid, Foo, opstruct
