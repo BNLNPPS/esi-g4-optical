@@ -5,6 +5,8 @@
 // ---
 #include "DetectorConstruction.hh"
 #include "ActionInitialization.hh"
+#include "WorkerInitialization.hh"
+
 
 #include "G4RunManagerFactory.hh"
 #include "G4SteppingVerbose.hh"
@@ -14,8 +16,6 @@
 #include "G4VisExecutive.hh"
 #include "Randomize.hh"
 
-// Keep here temporarily
-#include "G4UserWorkerInitialization.hh"
 
 // important for optical
 #include "G4EmStandardPhysics_option4.hh"
@@ -35,66 +35,6 @@ bool Steering::verbose;
 JULIA_DEFINE_FAST_TLS // only define this once, in an executable
 
 
-class WorkerInitialization : public G4UserWorkerInitialization {
-  public:
-    WorkerInitialization() = default;
-    virtual ~WorkerInitialization() = default;
-    virtual void WorkerInitialize() const override {
-      if (jl_get_pgcstack() == NULL) {
-      jl_adopt_thread();
-      std::cout << "=====> WORKER INIT, THREAD ADOPTED <===========" << std::endl;
-      }
-    }
-    virtual void WorkerStart() const override {}
-    virtual void WorkerRunStart() const override {
-      std::cout << "=====> WORKER RUN START <===========" << std::endl;
-      //jl_eval_string("println(sqrt(2.0))");
-      jl_function_t *test_func = jl_get_function(jl_main_module, "test_func");
-      if (test_func == NULL) {
-        G4cout << "Worker run start --  test_func is null, exiting..." << G4endl;      
-        jl_atexit_hook(0);
-        exit(0);
-      }
-    G4cout << "Calling test_func " << G4endl;
-    jl_call0(test_func);
-
-
-    jl_value_t *argument = jl_box_float64(2.0);
-    jl_function_t *operation = jl_get_function(jl_main_module, "operation");
-
-    jl_value_t *op_ret = jl_call1(operation, argument);
-
-    if (jl_typeis(op_ret, jl_float64_type)) {
-      double ret_unboxed = jl_unbox_float64(op_ret);
-      G4cout << "WORKER RUN START - op_ret in C: " <<  ret_unboxed << G4endl;
-    }
-    else {
-      G4cout << "ERROR: unexpected return type from op_ret" << G4endl;
-    }    
-  
-    
-    }
-
-    virtual void WorkerRunEnd() const override {
-    jl_value_t *argument = jl_box_float64(3.0);
-    jl_function_t *operation = jl_get_function(jl_main_module, "operation");
-
-    jl_value_t *op_ret = jl_call1(operation, argument);
-
-    if (jl_typeis(op_ret, jl_float64_type)) {
-      double ret_unboxed = jl_unbox_float64(op_ret);
-      G4cout << "Worker RUN END op_ret in C: " <<  ret_unboxed << G4endl;
-    }
-    else {
-      G4cout << "ERROR: unexpected return type from op_ret" << G4endl;
-    }   
-
-
-      jl_ptls_t ptls = jl_current_task->ptls;
-      jl_gc_safe_enter(ptls);
-    }
-    virtual void WorkerStop() const override {}
-};
 
 // -----------------------------------------------------------
 
@@ -123,8 +63,8 @@ int main(int argc,char** argv) {
   bool callback   = false;
   bool verbose    = false;
 
-  G4String macro          = "init_vis.mac";
-  std::string output_file    = "";
+  G4String macro          = "";
+  G4String output_file    = "";
 
   int threads = 0;
 
@@ -178,18 +118,10 @@ int main(int argc,char** argv) {
   G4cout << "threads:"                << nThreads           << G4endl;
 
   
-  if(output_file.length()>0) {
-    G4cout << "output file:"  << output_file  << G4endl;
-  }
-  else {
-    G4cout << "output file not specified" << G4endl;
-  }
-  G4cout << "macro:"        << macro        << G4endl;
+  if(output_file.size())  {G4cout << "output file:"   << output_file  << G4endl;} else {G4cout << "output file not specified" << G4endl;}
+  if(macro.size())        {G4cout << "macro file:"    << macro        << G4endl;} else {G4cout << "macro file not specified"  << G4endl;}
 
-  // exit(0);
-
-  // Detect interactive mode (if no macro provided) and define UI session
-  //
+  // -- hacky but the Executive works with argv...
   G4UIExecutive* ui = nullptr;
   if ( ! batch ) {
     argc = 1;
@@ -250,11 +182,23 @@ int main(int argc,char** argv) {
   // ################################################################################
   // Process macro or start UI session
   //
-  if ( macro.size() && batch ) {
-    // batch mode
-    G4cout << "************************ Batch execution of the macro:"        << macro        << G4endl;
-    G4String command = "/control/execute ";
-    UImanager->ApplyCommand(command+macro);
+  
+  if (batch) {
+    if(macro.size()) {
+      // batch mode
+      G4cout << "************************ Batch execution of the macro:"        << macro        << G4endl;
+      G4String command = "/control/execute ";
+      UImanager->ApplyCommand(command+macro);
+    }
+    else {
+      G4cout << "************************ Default Batch execution"  << G4endl;
+      UImanager->ApplyCommand("/run/initialize");
+      UImanager->ApplyCommand("/control/verbose 0");
+      UImanager->ApplyCommand("/tracking/verbose 0");
+      UImanager->ApplyCommand("/gun/particle mu+");
+      UImanager->ApplyCommand("/gun/energy 300 MeV");
+      UImanager->ApplyCommand("/run/beamOn 1000");
+    }
   }
   else  { // interactive mode : define UI session
     G4cout << "************************ UI mode" << G4endl;
