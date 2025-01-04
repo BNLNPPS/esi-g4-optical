@@ -20,6 +20,16 @@ end
 
 
 # ---
-export test_func, operation, opvoid
+mutable struct Foo
+  x::Float32
+end
+
+# ---
+function opstruct(x::Foo)
+  return
+end
+
+# ---
+export test_func, operation, opvoid, Foo, opstruct
 
 end
