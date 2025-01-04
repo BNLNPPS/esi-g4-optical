@@ -22,7 +22,7 @@ std::time_t start, stop;
 RunAction::RunAction(const G4String fn) {
   _filename=fn;
 
-  G4RunManager::GetRunManager()->SetPrintProgress(10);  // set printing event number per each event... Mind gui.mac!
+  G4RunManager::GetRunManager()->SetPrintProgress(-1);  // set printing event number per each event... Mind gui.mac!
 
   if (_filename.length()==0) { return;}
 

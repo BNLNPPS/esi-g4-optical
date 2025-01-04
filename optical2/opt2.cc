@@ -108,6 +108,14 @@ int main(int argc,char** argv) {
   jl_eval_string("Base.include(Main, \"./julia/custom_module.jl\")"); // load the user's module
   jl_eval_string("using .custom");
 
+
+  jl_function_t *foo= jl_get_function(jl_main_module, "Foo");
+  jl_function_t *opstruct= jl_get_function(jl_main_module, "opstruct");
+// if (test_func != NULL) {printf("test_func is not null\n");}
+// else {printf("test_func is null\n"); jl_atexit_hook(0); return 0;}
+// jl_call0(test_func);
+
+
   // --mxp--: We use lyra to parse the command line:
   bool help       = false;
   bool batch      = false;
@@ -199,21 +207,19 @@ int main(int argc,char** argv) {
   // ------------------ RUN MANAGER -----------------------------------
   G4RunManager* runManager;
 
+
+
   if (nThreads > 0) { 
     runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::MT);
     runManager->SetNumberOfThreads(nThreads);
+    runManager->SetVerboseLevel(0);
     runManager->SetUserInitialization(new WorkerInitialization());
   } else {
     runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Serial);
   }
 
   // auto runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
-  runManager->SetVerboseLevel(0);
-// #ifdef G4MULTITHREADED
-  // if ( nThreads > 0 ) {
-  //   runManager->SetNumberOfThreads(nThreads);
-  // }
-//#endif
+
 
   // Set mandatory initialization classes
   //
@@ -246,10 +252,12 @@ int main(int argc,char** argv) {
   //
   if ( macro.size() && batch ) {
     // batch mode
+    G4cout << "************************ Batch execution of the macro:"        << macro        << G4endl;
     G4String command = "/control/execute ";
     UImanager->ApplyCommand(command+macro);
   }
   else  { // interactive mode : define UI session
+    G4cout << "************************ UI mode" << G4endl;
     UImanager->ApplyCommand("/control/execute init_vis.mac");
     if (ui->IsGUI()) {UImanager->ApplyCommand("/control/execute gui.mac");}
     ui->SessionStart();
