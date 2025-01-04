@@ -67,6 +67,7 @@ int main(int argc,char** argv) {
   G4String output_file    = "";
 
   int threads = 0;
+  int nevents = 100;
 
   auto cli = lyra::cli() 
     | lyra::opt(output_file, "output_file")
@@ -75,6 +76,9 @@ int main(int argc,char** argv) {
     | lyra::opt(macro, "macro")
     ["-m"]["--macro"]
     ("Optional macro").optional()
+    | lyra::opt(nevents, "nevents")
+    ["-n"]["--nevents"]
+    ("Optional number of threads").optional()
     | lyra::opt(threads, "threads")
     ["-t"]["--threads"]
     ("Optional number of threads").optional()
@@ -102,6 +106,9 @@ int main(int argc,char** argv) {
 
   // exit(0);
 
+  std::string s = std::to_string(42);
+
+
   G4String  session;
   G4bool    verboseBestUnits = true;
   G4int     nThreads  = threads;
@@ -110,6 +117,8 @@ int main(int argc,char** argv) {
   Steering::analysis  = analysis;
   Steering::callback  = callback;
   Steering::verbose   = verbose;
+
+  G4cout << "Number of Events:"       << nevents << G4endl;
 
   G4cout << "Steering::analysis:"     << Steering::analysis << G4endl;
   G4cout << "batch mode:"             << batch              << G4endl;
@@ -197,7 +206,9 @@ int main(int argc,char** argv) {
       UImanager->ApplyCommand("/tracking/verbose 0");
       UImanager->ApplyCommand("/gun/particle mu+");
       UImanager->ApplyCommand("/gun/energy 300 MeV");
-      UImanager->ApplyCommand("/run/beamOn 1000");
+      G4String beam = "/run/beamOn ";
+      
+      UImanager->ApplyCommand( beam + std::to_string(nevents));
     }
   }
   else  { // interactive mode : define UI session
