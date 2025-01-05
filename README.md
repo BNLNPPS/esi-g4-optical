@@ -1,19 +1,21 @@
-# The ESI Optical Testbed
+# The ESI Testbed Area
 
 ## About
 
 This repository is meant for testing a variety of the Geant4 functionality
-related to optical processes, mainly Cherenkov photon generation and propagation.
+such as
+* Optical processes, mainly Cherenkov photon generation and propagation
+* Callback, e.g. with Julia
 
 ## Building
 
-It strongly recommended to use the "out of source" build pattern. For example,
-in the folder **optical1** one first creates a folder named "build", then
-runs CMake and finally the build itself using _make_, from the build folder itself.
+It recommended to use the "out of source" build pattern. For example, in the folder **optical**
+one first creates a folder named "build", then runs CMake and finally the build itself using _make_,
+from the `build` folder itself.
 This can look as follows:
 
 ```bash
-cd optical1
+cd optical
 mkdir build
 cmake -B build
 cd build/
