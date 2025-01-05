@@ -33,7 +33,6 @@ SteppingAction::SteppingAction(const DetectorConstruction *detConstruction) : fD
 // ---
 void SteppingAction::UserSteppingAction(const G4Step *step)
 {
-
   // action_jl(step);
   if(Steering::callback) {
     jl_value_t *argument = jl_box_float64(2.0);

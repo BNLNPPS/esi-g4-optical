@@ -48,6 +48,7 @@ end
 
 
 # ---
-export test_func, operation, opvoid, Foo, opstruct
+export test_func, operation, opvoid
+# , Foo, opstruct
 
 end
