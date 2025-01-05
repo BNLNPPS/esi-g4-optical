@@ -22,19 +22,12 @@
 #include "G4OpticalPhysics.hh"
 #include "FTFP_BERT.hh"
 // ---
-// CLI aruments handling:
-#include "lyra.hpp"
-
+#include "lyra.hpp" // CLI options handling
 #include <julia.h>
 
-
-bool Steering::analysis;
-bool Steering::callback;
-bool Steering::verbose;
+bool Steering::analysis, Steering::callback, Steering::verbose;
 
 JULIA_DEFINE_FAST_TLS // only define this once, in an executable
-
-
 
 // -----------------------------------------------------------
 
@@ -42,61 +35,34 @@ int main(int argc,char** argv) {
   /* required: setup the Julia context */
   jl_init();
 
-  /* run Julia commands */
-  //  jl_eval_string("println(sqrt(2.0))"); // check Julia is alive
-
-  jl_eval_string("Base.include(Main, \"./julia/custom_module.jl\")"); // load the user's module
-  jl_eval_string("using .custom");
+  jl_eval_string("Base.include(Main, \"./julia/custom_module.jl\")");
+  jl_eval_string("using .custom"); // load the user's module
 
 
-  jl_function_t *foo= jl_get_function(jl_main_module, "Foo");
-  jl_function_t *opstruct= jl_get_function(jl_main_module, "opstruct");
-// if (test_func != NULL) {printf("test_func is not null\n");}
-// else {printf("test_func is null\n"); jl_atexit_hook(0); return 0;}
-// jl_call0(test_func);
+  // Testing only, keep here for reference
+  // jl_eval_string("println(sqrt(2.0))"); // check Julia is alive
+  // jl_function_t *foo= jl_get_function(jl_main_module, "Foo");
+  // jl_function_t *opstruct= jl_get_function(jl_main_module, "opstruct");
 
+  // if (test_func != NULL) {printf("test_func is not null\n");}
+  // else {printf("test_func is null\n"); jl_atexit_hook(0); return 0;}
+  // jl_call0(test_func);
 
-  // --mxp--: We use lyra to parse the command line:
-  bool help       = false;
-  bool batch      = false;
-  bool analysis   = false;
-  bool callback   = false;
-  bool verbose    = false;
-
-  G4String macro          = "";
-  G4String output_file    = "";
-
-  int threads = 0;
-  int nevents = 100;
+  // We use lyra to parse the command line:
+  bool help=false, batch=false, analysis=false, callback=false, verbose=false;
+  G4String macro="", output_file="";
+  int threads = 0, nevents = 100;
 
   auto cli = lyra::cli() 
-    | lyra::opt(output_file, "output_file")
-    ["-o"]["--output_file"]
-    ("Output file, default empty").optional()
-    | lyra::opt(macro, "macro")
-    ["-m"]["--macro"]
-    ("Optional macro").optional()
-    | lyra::opt(nevents, "nevents")
-    ["-n"]["--nevents"]
-    ("Optional number of threads").optional()
-    | lyra::opt(threads, "threads")
-    ["-t"]["--threads"]
-    ("Optional number of threads").optional()
-    | lyra::opt(batch)
-    ["-b"]["--batch"]
-    ("Optional batch mode").optional()
-    | lyra::opt(callback)    
-    ["-c"]["--callback"]
-    ("Optional callback mode").optional()
-    | lyra::opt(analysis)
-    ["-a"]["--analysis"]
-    ("Optional analysis mode").optional()
-    | lyra::opt(verbose)
-    ["-v"]["--verbose"]    
-    ("Verbose").optional()
-    | lyra::opt(help)
-    ["-h"]["--help"]
-    ("Help").optional();
+    | lyra::opt(output_file, "output_file") ["-o"]["--output_file"]   ("Output file, default empty").optional()
+    | lyra::opt(macro, "macro")             ["-m"]["--macro"]         ("Optional macro").optional()
+    | lyra::opt(nevents, "nevents")         ["-n"]["--nevents"]       ("Optional: number of events").optional()
+    | lyra::opt(threads, "threads")         ["-t"]["--threads"]       ("Optional: number of threads").optional()
+    | lyra::opt(batch)                      ["-b"]["--batch"]         ("Optional batch mode").optional()
+    | lyra::opt(callback)                   ["-c"]["--callback"]      ("Optional: callback mode").optional()
+    | lyra::opt(analysis)                   ["-a"]["--analysis"]      ("Optional: analysis mode").optional()
+    | lyra::opt(verbose)                    ["-v"]["--verbose"]       ("Optional: verbose mode").optional()
+    | lyra::opt(help)                       ["-h"]["--help"]          ("Help").optional();
 
   auto result = cli.parse({ argc, argv });
 
@@ -104,10 +70,7 @@ int main(int argc,char** argv) {
   // Optionally, print help and exit:
   if(help) {std::cout << cli << std::endl; exit(0);}
 
-  // exit(0);
-
-  std::string s = std::to_string(42);
-
+  // ----------------------------------------------------------------------------------------------------------------
 
   G4String  session;
   G4bool    verboseBestUnits = true;
@@ -148,8 +111,6 @@ int main(int argc,char** argv) {
   // ------------------ RUN MANAGER -----------------------------------
   G4RunManager* runManager;
 
-
-
   if (nThreads > 0) { 
     runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::MT);
     runManager->SetNumberOfThreads(nThreads);
@@ -159,7 +120,7 @@ int main(int argc,char** argv) {
     runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Serial);
   }
 
-  // auto runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
+  // original -- auto runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
 
 
   // Set mandatory initialization classes
@@ -186,15 +147,14 @@ int main(int argc,char** argv) {
   // Get the pointer to the User Interface manager
   auto UImanager = G4UImanager::GetUIpointer();
 
+  // Handle the Julia GC mechanics, before execution:
   auto state = jl_gc_safe_enter(jl_current_task->ptls);
 
   // ################################################################################
-  // Process macro or start UI session
-  //
+  // Process macro. run the default sequence or start UI session
   
   if (batch) {
     if(macro.size()) {
-      // batch mode
       G4cout << "************************ Batch execution of the macro:"        << macro        << G4endl;
       G4String command = "/control/execute ";
       UImanager->ApplyCommand(command+macro);
@@ -222,6 +182,7 @@ int main(int argc,char** argv) {
   // Cleanup. User actions, the physics list and the detector description are owned and
   // deleted by the run manager, so don't delete them here
 
+  // Handle the Julia GC mechanics, on exit:
   jl_gc_safe_leave(jl_current_task->ptls, state);
 
   delete visManager;
