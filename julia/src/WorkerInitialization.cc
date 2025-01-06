@@ -1,3 +1,4 @@
+#include "G4Threading.hh"
 #include "WorkerInitialization.hh"
 #include "Steering.hh"
 #include <globals.hh>
@@ -23,7 +24,9 @@ void WorkerInitialization::WorkerStop()   const {};
 // ---
 void WorkerInitialization::WorkerRunStart() const
 {
-  G4cout << "=====> WORKER RUN START <===========" << G4endl;
+  auto id = G4Threading::G4GetThreadId();
+  G4cout << "=====> WORKER RUN START <===========   id: " << id << G4endl;
+
 
   jl_function_t *test_func = jl_get_function(jl_main_module, "test_func");
   if (test_func == NULL)

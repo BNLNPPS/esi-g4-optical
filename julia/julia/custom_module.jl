@@ -1,10 +1,16 @@
 module custom
 
 # - future dev
-mutable struct Foo
-  x::Float32
+mutable struct Steering
+  nthreads::Int8
 end
 
+function set_nthreads(s::Steering, nthreads::Int8)
+  println("!!!")
+  s.nthreads=nthreads
+  println(s.nthreads)
+  return
+end
 
 # ---
 function test_func()
@@ -25,30 +31,33 @@ function opvoid(x::Float64)
 end
 
 
-# # - future dev
-# ---
-function opstruct(x::Foo)
-  return
-end
-
-
-function opstruct(t::Foo, v::Float64)
-println("!!!")
-t.x=v
-println(t.x)
-return
-end
-
-function newstruct()
-println("new")
-y = Foo(1.0)
-return y
-end
 
 
 
 # ---
-export test_func, operation, opvoid
+export operation, opvoid, test_func
 # , Foo, opstruct
 
 end
+
+
+
+# # # - future dev
+# # ---
+# function opstruct(x::Foo)
+#   return
+# end
+
+
+# function opstruct(t::Foo, v::Float64)
+# println("!!!")
+# t.x=v
+# println(t.x)
+# return
+# end
+
+# function newstruct()
+# println("new")
+# y = Foo(1.0)
+# return y
+# end

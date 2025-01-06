@@ -40,7 +40,18 @@ int main(int argc,char** argv) {
 
 
   // Testing only, keep here for reference
-  // jl_eval_string("println(sqrt(2.0))"); // check Julia is alive
+  jl_eval_string("println(sqrt(2.0))"); // check Julia is alive
+
+  jl_function_t* action_jl = jl_get_function(jl_main_module, "operation");
+  if (action_jl == NULL) {
+      G4cout << "MAIN --  action_jl is null, exiting..." << G4endl;      
+      jl_atexit_hook(0);
+      exit(0);
+  }
+  else {
+    G4cout << "MAIN -- test load of Julia successful" << G4endl;
+  }
+
   // jl_function_t *foo= jl_get_function(jl_main_module, "Foo");
   // jl_function_t *opstruct= jl_get_function(jl_main_module, "opstruct");
 
@@ -92,6 +103,13 @@ int main(int argc,char** argv) {
   
   if(output_file.size())  {G4cout << "output file:"   << output_file  << G4endl;} else {G4cout << "output file not specified" << G4endl;}
   if(macro.size())        {G4cout << "macro file:"    << macro        << G4endl;} else {G4cout << "macro file not specified"  << G4endl;}
+
+
+  // jl_function_t *jl_steering = jl_get_function(jl_main_module, "Steering");
+  // jl_function_t *set_nthreads= jl_get_function(jl_main_module, "set_nthreads");
+  // jl_value_t *jl_nthreads = jl_box_int8(nThreads);
+  // jl_call0(test_func);
+  //set_nthreads
 
   // -- hacky but the Executive works with argv...
   G4UIExecutive* ui = nullptr;
