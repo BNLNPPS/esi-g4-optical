@@ -38,6 +38,22 @@ void SteppingAction::UserSteppingAction(const G4Step *step)
     jl_value_t *argument = jl_box_float64(2.0);
     jl_value_t *op_ret = jl_call1(action_jl, argument);
 
+    G4Track* theTrack = step->GetTrack();
+    const G4DynamicParticle* particle = theTrack->GetDynamicParticle();
+
+
+    const G4StepPoint* preStepPoint = step->GetPreStepPoint();
+    const G4StepPoint* postStepPoint = step->GetPostStepPoint();
+    const G4TouchableHandle& preStepTouch = preStepPoint->GetTouchableHandle();
+    const G4VPhysicalVolume* volume = preStepTouch->GetVolume();
+    const G4LogicalVolume* lVolume = volume->GetLogicalVolume();
+    G4String vname = volume->GetName();
+
+    if(vname=="detectorPhysical") {
+    // G4cout << lvm << G4endl;
+    G4double ed = step->GetTotalEnergyDeposit();
+    G4cout << ed << G4endl;
+    }
     // action_jl();
     //jl_call0(action_jl);
     // jl_eval_string("println(sqrt(2.0))");

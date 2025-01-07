@@ -105,16 +105,26 @@ int main(int argc,char** argv) {
   if(macro.size())        {G4cout << "macro file:"    << macro        << G4endl;} else {G4cout << "macro file not specified"  << G4endl;}
 
 
-  // jl_function_t *jl_steering = jl_get_function(jl_main_module, "Steering");
-  // jl_function_t *set_nthreads= jl_get_function(jl_main_module, "set_nthreads");
-  // jl_value_t *jl_nthreads = jl_box_int8(nThreads);
-  // jl_call0(test_func);
-  //set_nthreads
+  // jl_function_t *jl_steering = jl_get_function(jl_main_module, "steering");
+  // jl_value_t *st = jl_call0(jl_steering);
 
-  // -- hacky but the Executive works with argv...
+
+  // jl_function_t *set_nthreads= jl_get_function(jl_main_module, "set_nthreads");
+  jl_value_t *jl_nt = jl_box_int8(nThreads);
+  // jl_call2(set_nthreads, st, jl_nthreads);
+
+  jl_function_t *jl_nthreads = jl_get_function(jl_main_module, "nthreads");
+  jl_function_t *jl_set_nthreads = jl_get_function(jl_main_module, "set_nthreads");
+
+  jl_call1(jl_set_nthreads, jl_nt);
+  jl_value_t *testn = jl_call0(jl_nthreads);
+  int testN = jl_unbox_int8(testn);
+  G4cout << "-------------------->  N: " <<  testN << G4endl;  
+
+  
   G4UIExecutive* ui = nullptr;
-  if ( ! batch ) {
-    argc = 1;
+  if (!batch) {
+    argc = 1; // -- hacky but the Executive works with argv...
     ui = new G4UIExecutive(argc, argv); // ui = new G4UIExecutive(argc, argv, session);
   }
 

@@ -1,16 +1,23 @@
 module custom
 
-# - future dev
+# ----
 mutable struct Steering
   nthreads::Int8
 end
 
-function set_nthreads(s::Steering, nthreads::Int8)
-  println("!!!")
-  s.nthreads=nthreads
-  println(s.nthreads)
+MySteering = Steering(0)
+
+
+function nthreads()
+  return MySteering.nthreads
+end
+
+function set_nthreads(n::Int8)
+  MySteering.nthreads=n
   return
 end
+
+
 
 # ---
 function test_func()
@@ -35,7 +42,7 @@ end
 
 
 # ---
-export operation, opvoid, test_func
+export operation, opvoid, test_func, set_nthreads, nthreads
 # , Foo, opstruct
 
 end
@@ -43,6 +50,18 @@ end
 
 
 # # # - future dev
+
+# function steering()
+#   println("new steering")
+#   s = Steering(0)
+#   return s
+# end
+
+# function set_nthreads(s::Steering, nthreads::Int8)
+#   s.nthreads=nthreads
+#   return
+# end
+
 # # ---
 # function opstruct(x::Foo)
 #   return
