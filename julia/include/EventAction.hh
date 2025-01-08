@@ -4,13 +4,13 @@
 #include "G4UserEventAction.hh"
 #include "globals.hh"
 
-// In EndOfEventAction(), it prints the accumulated quantities of the energy
-// deposit and track lengths of charged particles in Absober and Gap layers
-// stored in RunData object.
+#include <julia.h>
+
+// ---
 
 class EventAction : public G4UserEventAction {
   public:
-    EventAction() = default;
+    EventAction(); // = default;
     ~EventAction() override = default;
 
     void  BeginOfEventAction(const G4Event* event)  override;
@@ -19,6 +19,8 @@ class EventAction : public G4UserEventAction {
   private:
     void PrintEventStatistics(G4double absoEdep, G4double absoTrackLength,
                               G4double gapEdep, G4double gapTrackLength) const;
+
+    jl_function_t* begin_event_action_jl=NULL;
 };
 
 #endif

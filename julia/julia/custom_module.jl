@@ -20,10 +20,23 @@ end
 
 
 # ---
+function begin_run()
+  println("Begin of Run Action")
+  return
+end
+
+# ---
+function begin_event(thread::Int8)
+  # println("Begin of Event Action")
+  return thread
+end
+
+
+# ---
 function test_func()
     # println("Test function")
     return
-  end
+end
 
 # ---
 function operation(x::Float64)
@@ -42,7 +55,7 @@ end
 
 
 # ---
-export operation, opvoid, test_func, set_nthreads, nthreads
+export operation, opvoid, test_func, set_nthreads, nthreads, begin_run, begin_event
 # , Foo, opstruct
 
 end
