@@ -36,7 +36,7 @@ void WorkerInitialization::WorkerRunStart() const
     exit(0);
   }
 
-  G4cout << "Calling test_func " << G4endl;
+  G4cout << "Worker initialization -- Calling test_func " << G4endl;
   jl_call0(test_func);
 
   jl_value_t *argument = jl_box_float64(2.0);

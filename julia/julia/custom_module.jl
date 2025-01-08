@@ -1,23 +1,24 @@
 module custom
+using ..steering
+using Parameters
 
-# ----
-mutable struct Steering
-  nthreads::Int8
-end
-
-MySteering = Steering(0)
+println("=====> Loading custom_module.jl")
+println("=====> ", nthreads())
 
 
-function nthreads()
-  return MySteering.nthreads
-end
-
-function set_nthreads(n::Int8)
-  MySteering.nthreads=n
-  return
+@with_kw mutable struct MyData
+  edep::Float64 = 0.0
+  # edepHist = H1D("Event total Edep distribution", 100, 0., 110.)
 end
 
 
+# const simdata = [MyData() for i in 1:(MySteering.nthreads()+1)] 
+
+# FIXME -- need to find a way to init this with the actual number of threads.
+const simdata = [MyData() for i in 1:16] 
+
+#function check_steering()
+#  return 
 
 # ---
 function begin_run()
@@ -32,11 +33,6 @@ function begin_event(thread::Int8)
 end
 
 
-# ---
-function test_func()
-    # println("Test function")
-    return
-end
 
 # ---
 function operation(x::Float64)
@@ -55,7 +51,7 @@ end
 
 
 # ---
-export operation, opvoid, test_func, set_nthreads, nthreads, begin_run, begin_event
+export operation, opvoid, begin_run, begin_event
 # , Foo, opstruct
 
 end

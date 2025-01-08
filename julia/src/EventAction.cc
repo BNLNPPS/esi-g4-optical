@@ -18,7 +18,7 @@
 EventAction::EventAction() {
   begin_event_action_jl = jl_get_function(jl_main_module, "begin_event");
   if (begin_event_action_jl == NULL) {
-      G4cout << "Event Action ctor --  begin)event_action_jl is null, exiting..." << G4endl;
+      G4cout << "Event Action ctor --  begin_event_action_jl is null, exiting..." << G4endl;
       jl_atexit_hook(0);
       exit(0);
     }
