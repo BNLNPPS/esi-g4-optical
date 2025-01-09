@@ -17,8 +17,9 @@ end
 # FIXME -- need to find a way to init this with the actual number of threads.
 const simdata = [MyData() for i in 1:16] 
 
-#function check_steering()
-#  return 
+function getMyData(thread::Int8)
+  simdata[thread+1]
+end 
 
 # ---
 function begin_run()
@@ -28,8 +29,24 @@ end
 
 # ---
 function begin_event(thread::Int8)
-  # println("Begin of Event Action")
-  return thread
+  datum = simdata[thread+1]
+  datum.edep = 0.0
+  return datum.edep
+end
+
+# ---
+function end_event(thread::Int8)
+  datum = simdata[thread+1]
+  return datum.edep
+end
+
+
+# ---
+function stepping_action(thread::Int8, energy::Float64)
+  datum = simdata[thread+1]
+  datum.edep+=energy
+  return datum.edep
+return
 end
 
 
@@ -40,18 +57,13 @@ function operation(x::Float64)
     return x*2.0
 end
 
-# ---
-function opvoid(x::Float64)
-  x*2.0
-  return
-end
 
 
 
 
 
 # ---
-export operation, opvoid, begin_run, begin_event
+export operation, stepping_action, begin_run, begin_event, end_event, getMyData
 # , Foo, opstruct
 
 end

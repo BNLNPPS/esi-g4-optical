@@ -21,6 +21,7 @@ class EventAction : public G4UserEventAction {
                               G4double gapEdep, G4double gapTrackLength) const;
 
     jl_function_t* begin_event_action_jl=NULL;
+    jl_function_t*   end_event_action_jl=NULL;    
 };
 
 #endif
