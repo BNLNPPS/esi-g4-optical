@@ -58,6 +58,9 @@ G4Run* RunAction::GenerateRun() {
 // ---
 
 void RunAction::BeginOfRunAction(const G4Run* run) {
+  auto id = G4Threading::G4GetThreadId();
+  G4cout << "=====> RUN START REPORT <===========   id: " << id << G4endl;
+
   G4cout << "### Run " << run->GetRunID() << " start." << G4endl;
   if (_filename.length()==0) {
     start = system_clock::to_time_t(system_clock::now());
@@ -100,11 +103,11 @@ void RunAction::EndOfRunAction(const G4Run* /*aRun*/) {
     G4cout << "##### Time stop = " << std::ctime(&stop) << G4endl;
     //nanoseconds diff = stop - start;
     double diff = difftime(stop, start);
-    G4cout << diff << G4endl;
-    G4cout << "+++++++++++++++++++++++++++++++ END OF RUN ++++++++++++++++++++++++++++++++++++++++++++++" << G4endl;
+    // G4cout << diff << G4endl;
+    // G4cout << "+++++++++++++++++++++++++++++++ END OF RUN ++++++++++++++++++++++++++++++++++++++++++++++" << G4endl;
     return;
   }
-  G4cout << "+++++++++++++++++++++++++++++++ END OF RUN ++++++++++++++++++++++++++++++++++++++++++++++" << G4endl;
+  // G4cout << "+++++++++++++++++++++++++++++++ END OF RUN ++++++++++++++++++++++++++++++++++++++++++++++" << G4endl;
 
   auto runData = static_cast<RunData*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
   G4int N = runData->GetNphotons();

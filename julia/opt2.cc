@@ -32,21 +32,6 @@ JULIA_DEFINE_FAST_TLS // only define this once, in an executable
 // -----------------------------------------------------------
 
 int main(int argc,char** argv) {
-  /* required: setup the Julia context */
-  jl_init();
-
-  jl_eval_string("Base.include(Main, \"./julia/custom_module.jl\")");
-  jl_eval_string("using .custom"); // load the user's module
-
-
-  // Testing only, keep here for reference
-  // jl_eval_string("println(sqrt(2.0))"); // check Julia is alive
-  // jl_function_t *foo= jl_get_function(jl_main_module, "Foo");
-  // jl_function_t *opstruct= jl_get_function(jl_main_module, "opstruct");
-
-  // if (test_func != NULL) {printf("test_func is not null\n");}
-  // else {printf("test_func is null\n"); jl_atexit_hook(0); return 0;}
-  // jl_call0(test_func);
 
   // We use lyra to parse the command line:
   bool help=false, batch=false, analysis=false, callback=false, verbose=false;
@@ -93,10 +78,68 @@ int main(int argc,char** argv) {
   if(output_file.size())  {G4cout << "output file:"   << output_file  << G4endl;} else {G4cout << "output file not specified" << G4endl;}
   if(macro.size())        {G4cout << "macro file:"    << macro        << G4endl;} else {G4cout << "macro file not specified"  << G4endl;}
 
-  // -- hacky but the Executive works with argv...
+  /* required: setup the Julia context */
+  jl_init();
+
+  // Handle the Julia GC mechanics, before execution:
+  auto state = jl_gc_safe_enter(jl_current_task->ptls);
+
+  jl_eval_string("Base.include(Main, \"./julia/steering.jl\")");
+  jl_eval_string("using .steering"); // load the user's module
+
+  jl_eval_string("println(sqrt(2.0))"); // check Julia is alive
+
+  jl_function_t* test_jl = jl_get_function(jl_main_module, "test_func");
+
+  if (test_jl == NULL) {
+      G4cout << "MAIN --  test_jl is null, exiting..." << G4endl;      
+      jl_atexit_hook(0);
+      exit(0);
+  }
+  else {
+    G4cout << "MAIN -- test load of Julia successful" << G4endl;
+  }
+
+
+  G4cout << "MAIN -- Calling test_func " << G4endl;
+  jl_call0(test_jl);
+
+  // jl_function_t *jl_steering = jl_get_function(jl_main_module, "steering");
+  // jl_value_t *st = jl_call0(jl_steering);
+
+
+  // jl_function_t *set_nthreads= jl_get_function(jl_main_module, "set_nthreads");
+  jl_value_t *jl_nt = jl_box_int8(nThreads);
+  // jl_call2(set_nthreads, st, jl_nthreads);
+
+
+  G4cout << "MAIN -- getting to the steering..." << G4endl;  
+
+  jl_function_t *jl_nthreads = jl_get_function(jl_main_module, "nthreads");
+  jl_function_t *jl_set_nthreads = jl_get_function(jl_main_module, "set_nthreads");
+
+  jl_call1(jl_set_nthreads, jl_nt);
+  jl_value_t *testn = jl_call0(jl_nthreads);
+  int testN = jl_unbox_int8(testn);
+  G4cout << "MAIN -- getting threads from Julia, N: " <<  testN << G4endl;  
+
+  jl_eval_string("Base.include(Main, \"./julia/custom_module.jl\")");
+  jl_eval_string("using .custom"); // load the user's module
+  
+  // jl_value_t *mod = jl_eval_string("custom");
+  // jl_function_t *f = (jl_function_t*)jl_get_global((jl_module_t*)mod,jl_symbol("begin_event"));
+
+
+  jl_function_t *begin_event_action_jl = jl_get_function(jl_main_module, "begin_event");
+  if (begin_event_action_jl == NULL) {
+    G4cout << "MAIN --  begin_event_action_jl is null, exiting..." << G4endl;
+    jl_atexit_hook(0);
+    exit(0);
+  }
+
   G4UIExecutive* ui = nullptr;
-  if ( ! batch ) {
-    argc = 1;
+  if (!batch) {
+    argc = 1; // -- hacky but the Executive works with argv...
     ui = new G4UIExecutive(argc, argv); // ui = new G4UIExecutive(argc, argv, session);
   }
 
@@ -147,8 +190,7 @@ int main(int argc,char** argv) {
   // Get the pointer to the User Interface manager
   auto UImanager = G4UImanager::GetUIpointer();
 
-  // Handle the Julia GC mechanics, before execution:
-  auto state = jl_gc_safe_enter(jl_current_task->ptls);
+
 
   // ################################################################################
   // Process macro. run the default sequence or start UI session

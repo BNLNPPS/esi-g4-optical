@@ -47,6 +47,7 @@ target_link_libraries(Opt2 ${Geant4_LIBRARIES} julia)
 # relies on these scripts being in the current working directory.
 #
 set(OPTICAL2_SCRIPTS
+  julia/steering.jl
   julia/custom_module.jl
   example.in
   gui.mac

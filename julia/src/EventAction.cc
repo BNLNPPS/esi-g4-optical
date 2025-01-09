@@ -15,6 +15,25 @@
 #include <iomanip>
 
 // ---
+EventAction::EventAction() {
+
+  begin_event_action_jl = jl_get_function(jl_main_module, "begin_event");
+  if (begin_event_action_jl == NULL) {
+      G4cout << "Event Action ctor --  begin_event_action_jl is null, exiting..." << G4endl;
+      jl_atexit_hook(0);
+      exit(0);
+  }
+
+  end_event_action_jl = jl_get_function(jl_main_module, "end_event");
+  if (end_event_action_jl == NULL) {
+      G4cout << "Event Action ctor --  end_event_action_jl is null, exiting..." << G4endl;
+      jl_atexit_hook(0);
+      exit(0);
+  }
+
+}
+
+// ---
 void EventAction::PrintEventStatistics(
                               G4double absoEdep, G4double absoTrackLength,
                               G4double gapEdep, G4double gapTrackLength) const
@@ -34,9 +53,16 @@ void EventAction::PrintEventStatistics(
 }
 
 // ---
-void EventAction::BeginOfEventAction(const G4Event* /*event*/) {
-
+void EventAction::BeginOfEventAction(const G4Event*) {
   auto runData = static_cast<RunData*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
+  auto id = G4Threading::G4GetThreadId();
+  
+  jl_value_t *argument = jl_box_int8(id);
+  jl_value_t *thread_ret = jl_call1(begin_event_action_jl, argument);
+  float thread_ret_unboxed = jl_unbox_float64(thread_ret);  
+
+  // G4cout << "=====> Begin Event <=========== thread data: " << thread_ret_unboxed << G4endl;
+
   runData->Reset();
 }
 
@@ -55,5 +81,14 @@ void EventAction::EndOfEventAction(const G4Event* event) {
   }
 
   runData->FillPerEvent();
+
+  auto id = G4Threading::G4GetThreadId();
+  
+  jl_value_t *argument = jl_box_int8(id);
+  jl_value_t *thread_ret = jl_call1(end_event_action_jl, argument);
+  float thread_ret_unboxed = jl_unbox_float64(thread_ret);  
+
+  G4cout << "=====> END Event <=========== thread data: " << thread_ret_unboxed << G4endl;
+
 }
 
