@@ -1,6 +1,7 @@
 module custom
 using ..steering
 using Parameters
+using FHist
 
 println("=====> Loading custom_module.jl")
 println("=====> ", nthreads())
@@ -8,6 +9,7 @@ println("=====> ", nthreads())
 
 @with_kw mutable struct MyData
   edep::Float64 = 0.0
+  h1 = Hist1D(; binedges = 1:10)
   # edepHist = H1D("Event total Edep distribution", 100, 0., 110.)
 end
 
@@ -37,7 +39,8 @@ end
 # ---
 function end_event(thread::Int8)
   datum = simdata[thread+1]
-  return datum.edep
+  tot = FHist.integral(datum.h1)
+  return tot # datum.edep
 end
 
 
@@ -45,6 +48,7 @@ end
 function stepping_action(thread::Int8, energy::Float64)
   datum = simdata[thread+1]
   datum.edep+=energy
+  push!(datum.h1, energy*1000000.0)
   return datum.edep
 return
 end
