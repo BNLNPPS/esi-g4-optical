@@ -19,7 +19,7 @@ ActionInitialization::ActionInitialization(DetectorConstruction* detConstruction
 
 // --- MASTER
 void ActionInitialization::BuildForMaster() const {
-  RunAction*    rA = new RunAction(_FileName);
+  RunAction*    rA = new RunAction(_FileName, true);
   SetUserAction(rA);
 
   if(_FileName.length()>0) {
@@ -30,48 +30,6 @@ void ActionInitialization::BuildForMaster() const {
   }
 
   G4cout << "MASTER: checking Julia sqrt(2) ";  jl_eval_string("println(sqrt(2.0))");
-
-    // jl_function_t *test_func = jl_get_function(jl_main_module, "test_func");
-    // jl_call0(test_func);
-
-
-
-  // if(Steering::callback) {
-  //   jl_eval_string("println(sqrt(2.0))");
-  //   jl_function_t *test_func = jl_get_function(jl_main_module, "test_func");
-
-  //   if (test_func == NULL) {
-  //     G4cout << "Action initialization --  test_func is null, exiting..." << G4endl;      
-  //     jl_atexit_hook(0);
-  //     exit(0);
-  //   }
-
-  //   G4cout << "Action Init -- Calling test_func " << G4endl;
-  //   // jl_call0(test_func);
-
-
-  //   jl_value_t *argument = jl_box_float64(2.0);
-  //   jl_function_t *operation = jl_get_function(jl_main_module, "operation");
-
-  //   if (operation == NULL) {
-  //     G4cout << "Action initialization --  operation is null, exiting..." << G4endl;      
-  //     jl_atexit_hook(0);
-  //     exit(0);
-  //   }
-
-
-  //   jl_value_t *op_ret = jl_call1(operation, argument);
-
-  //   if (jl_typeis(op_ret, jl_float64_type)) {
-  //     double ret_unboxed = jl_unbox_float64(op_ret);
-  //     G4cout << "op_ret in C: " <<  ret_unboxed << G4endl;
-  //   }
-  //   else {
-  //     G4cout << "ERROR: unexpected return type from op_ret" << G4endl;
-  //   }
-  // }
-
-
 }
 
 // --- WORKER

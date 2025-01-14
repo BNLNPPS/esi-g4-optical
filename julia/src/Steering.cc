@@ -3,10 +3,11 @@
 #include "Steering.hh"
 #include <julia.h>
 
+
+// Keep this stub here for future dev
 double Steering::julia_arith() {
 
-
-    jl_value_t *argument = jl_box_float64(2.0);
+    // jl_value_t *argument = jl_box_float64(2.0);
     // jl_function_t *operation = jl_get_function(jl_main_module, "operation");
 
     // jl_value_t *op_ret = jl_call1(operation, argument);

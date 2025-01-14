@@ -25,7 +25,13 @@ end
 
 # ---
 function begin_run()
-  println("Begin of Run Action")
+  println("=====> MASTER Julia: Begin of Run Action")
+  return
+end
+
+
+function end_run()
+  println("=====> MASTER Julia: End of Run Action")
   return
 end
 
@@ -54,25 +60,19 @@ return
 end
 
 
-
 # ---
-function operation(x::Float64)
-    x*2.0
-    return x*2.0
+export stepping_action, begin_run, end_run, begin_event, end_event, getMyData
+
 end
 
 
 
-
-
-
+# # # - ATTIC
 # ---
-export operation, stepping_action, begin_run, begin_event, end_event, getMyData
-# , Foo, opstruct
-
-end
-
-
+# function operation(x::Float64)
+#     x*2.0
+#     return x*2.0
+# end
 
 # # # - future dev
 
