@@ -69,16 +69,14 @@ void EventAction::BeginOfEventAction(const G4Event*) {
 // ---
 void EventAction::EndOfEventAction(const G4Event* event) {
   //        auto analysisManager = G4AnalysisManager::Instance();
-  auto runData = static_cast<RunData*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
-
-  auto analysisManager = G4AnalysisManager::Instance();
+  auto runData          = static_cast<RunData*>(G4RunManager::GetRunManager()->GetNonConstCurrentRun());
+  auto analysisManager  = G4AnalysisManager::Instance();
 
   // G4cout << "Open file:"  << analysisManager->IsOpenFile()  << G4endl;
-
-  if(Steering::verbose) {
-    G4int N = runData->GetNphotons();
-    G4cout << "Photons in Event:" << N << G4endl;
-  }
+  // if(Steering::verbose) {
+  //   G4int N = runData->GetNphotons();
+  //   G4cout << "Photons in Event:" << N << G4endl;
+  // }
 
   runData->FillPerEvent();
 

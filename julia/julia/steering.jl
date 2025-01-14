@@ -20,8 +20,7 @@ end
 
 
 # ---
-function test_func()
-  # println("Test function")
+function test_func() # just to check if the loading works -- a summy function
   return
 end
 
