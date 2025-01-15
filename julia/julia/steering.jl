@@ -1,4 +1,5 @@
 module steering
+# using Plots
 # ----
 
 println("=====> Loading steering.jl")

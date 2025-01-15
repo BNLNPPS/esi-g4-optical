@@ -1,7 +1,9 @@
 module custom
+
 using ..steering
 using Parameters
 using FHist
+
 
 println("=====> Loading custom_module.jl")
 println("=====> ", nthreads())
@@ -32,6 +34,7 @@ end
 
 function end_run()
   println("=====> MASTER Julia: End of Run Action")
+  # img = plot(h.hist, title=h.title)
   return
 end
 
