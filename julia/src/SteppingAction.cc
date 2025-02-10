@@ -19,35 +19,31 @@ SteppingAction::SteppingAction(const DetectorConstruction *detConstruction) : fD
 {
 
   action_jl = jl_get_function(jl_main_module, "stepping_action");
-  if (action_jl == NULL)
-  {
-    G4cout << "Stepping Action ctor --  action_jl is null, exiting..." << G4endl;
-    jl_atexit_hook(0);
-    exit(0);
+  if (action_jl == NULL) {
+    G4cout << "Stepping Action ctor --  action_jl is null." << G4endl;
+    // jl_atexit_hook(0);
+    // exit(0);
   }
 }
 
 // ---
-void SteppingAction::UserSteppingAction(const G4Step *step)
-{
-  // action_jl(step);
-  if (Steering::callback)
-  {
+void SteppingAction::UserSteppingAction(const G4Step *step) {
+  if (Steering::callback) {
 
     G4Track *theTrack = step->GetTrack();
 
-    const G4DynamicParticle *particle = theTrack->GetDynamicParticle();
+    const G4DynamicParticle *particle     = theTrack->GetDynamicParticle();
 
-    const G4StepPoint *preStepPoint = step->GetPreStepPoint();
-    const G4StepPoint *postStepPoint = step->GetPostStepPoint();
+    const G4StepPoint *preStepPoint       = step->GetPreStepPoint();
+    const G4StepPoint *postStepPoint      = step->GetPostStepPoint();
 
     const G4TouchableHandle &preStepTouch = preStepPoint->GetTouchableHandle();
-    const G4VPhysicalVolume *volume = preStepTouch->GetVolume();
-    const G4LogicalVolume *lVolume = volume->GetLogicalVolume();
+    const G4VPhysicalVolume *volume       = preStepTouch->GetVolume();
+    const G4LogicalVolume *lVolume        = volume->GetLogicalVolume();
 
     G4String vname = volume->GetName();
 
-    if (vname == "detectorPhysical") {
+    if (vname == "detectorPhysical" && action_jl) {
 
       G4double ed = step->GetTotalEnergyDeposit();
 
@@ -60,25 +56,16 @@ void SteppingAction::UserSteppingAction(const G4Step *step)
 
       // G4cout << ed << G4endl;
     }
-    // action_jl();
-    // jl_call0(action_jl);
-    // jl_eval_string("println(sqrt(2.0))");
-
-    // jl_value_t *argument = jl_box_float64(2.0);
-    // jl_call1(action_jl, argument);
   }
 
-  if (not Steering::analysis)
-  {
+  if (not Steering::analysis) {
     return;
   }
-  //
+  
+  // ---
   G4Track *theTrack = step->GetTrack();
-  if (theTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition())
-  {
-
-    if (theTrack->GetCreatorProcess()->GetProcessName() == "Cerenkov")
-    {
+  if (theTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) {
+    if (theTrack->GetCreatorProcess()->GetProcessName() == "Cerenkov") {
 
       double x = step->GetPostStepPoint()->GetPosition().x();
       double y = step->GetPostStepPoint()->GetPosition().y();
