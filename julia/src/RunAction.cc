@@ -23,20 +23,21 @@ RunAction::RunAction(const G4String fn, bool master) {
   _filename = fn;
   _master   = master;
 
-  begin_run_jl = jl_get_function(jl_main_module, "begin_run");
-  if (begin_run_jl == NULL) {
-    G4cout << "Run Action ctor --  begin_run_jl is null, exiting..." << G4endl;
-    jl_atexit_hook(0);
-    exit(0);
-  }
+  if (Steering::callback) {
+    begin_run_jl = jl_get_function(jl_main_module, "begin_run");
+    if (begin_run_jl == NULL) {
+      G4cout << "Run Action ctor --  begin_run_jl is null." << G4endl;
+      // jl_atexit_hook(0);
+      // exit(0);
+    }
 
-  end_run_jl = jl_get_function(jl_main_module, "end_run");
-  if (begin_run_jl == NULL) {
-    G4cout << "Run Action ctor --  end_run_jl is null, exiting..." << G4endl;
-    jl_atexit_hook(0);
-    exit(0);
+    end_run_jl = jl_get_function(jl_main_module, "end_run");
+    if (begin_run_jl == NULL) {
+      G4cout << "Run Action ctor --  end_run_jl is null." << G4endl;
+      // jl_atexit_hook(0);
+      // exit(0);
+    }
   }
-
 
   G4RunManager::GetRunManager()->SetPrintProgress(-1);  // set printing event number per each event... Mind gui.mac!
 

@@ -1,4 +1,5 @@
-module steering
+#module steering
+#using Plots
 # ----
 
 println("=====> Loading steering.jl")
@@ -24,6 +25,6 @@ function test_func() # just to check if the loading works -- a summy function
   return
 end
 
-export set_nthreads, nthreads, test_func
+#export set_nthreads, nthreads, test_func
 
-end
+#end

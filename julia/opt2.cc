@@ -78,64 +78,63 @@ int main(int argc,char** argv) {
   if(output_file.size())  {G4cout << "output file:"   << output_file  << G4endl;} else {G4cout << "output file not specified" << G4endl;}
   if(macro.size())        {G4cout << "macro file:"    << macro        << G4endl;} else {G4cout << "macro file not specified"  << G4endl;}
 
-  /* required: setup the Julia context */
-  jl_init();
 
-  // Handle the Julia GC mechanics, before execution:
-  auto state = jl_gc_safe_enter(jl_current_task->ptls);
+  int8_t state=0;
+   // ####################### START JULIA SETUP ##########################
+  if (Steering::callback) {
+    jl_init(); /* required: setup the Julia context */
+        state = jl_gc_safe_enter(jl_current_task->ptls); // Handle the Julia GC mechanics, before execution:
 
-  jl_eval_string("Base.include(Main, \"./julia/steering.jl\")");
-  jl_eval_string("using .steering"); // load the user's module
+    
+    //    jl_eval_string("Base.include(Main, \"./julia/steering.jl\")");
+   
+    jl_eval_string("include(\"./julia/steering.jl\")");
+    //jl_eval_string("using .steering"); // load the user's module
 
-  jl_eval_string("println(sqrt(2.0))"); // check Julia is alive
+    jl_eval_string("include(\"./julia/custom_module.jl\")");
+    jl_eval_string("using .custom");
 
-  jl_function_t* test_jl = jl_get_function(jl_main_module, "test_func");
+    // jl_eval_string("using Plots"); // test
 
-  if (test_jl == NULL) {
+    jl_eval_string("println(sqrt(2.0))"); // check Julia is alive
+
+    jl_function_t* test_jl = jl_get_function(jl_main_module, "test_func");
+
+    if (test_jl == NULL) {
       G4cout << "MAIN --  test_jl is null, exiting..." << G4endl;      
       jl_atexit_hook(0);
       exit(0);
+    }
+    else {
+      G4cout << "MAIN -- test load of Julia successful" << G4endl;
+    }
+
+
+    G4cout << "MAIN -- Calling test_func " << G4endl;
+    jl_call0(test_jl);
+    jl_value_t *jl_nt = jl_box_int8(nThreads);
+    G4cout << "MAIN -- getting to the steering..." << G4endl;  
+    jl_function_t *jl_nthreads = jl_get_function(jl_main_module, "nthreads");
+    jl_function_t *jl_set_nthreads = jl_get_function(jl_main_module, "set_nthreads");
+
+    jl_call1(jl_set_nthreads, jl_nt);
+    jl_value_t *testn = jl_call0(jl_nthreads);
+    int testN = jl_unbox_int8(testn);
+    G4cout << "MAIN -- getting threads from Julia, N: " <<  testN << G4endl;  
+
+    // The actual payload Julia code is loaded here
+    // jl_eval_string("Base.include(Main, \"./julia/custom_module.jl\")");
+    // jl_eval_string("using .custom"); // load the user's module
+
+    jl_function_t *begin_event_action_jl = jl_get_function(jl_main_module, "begin_event");
+    if (begin_event_action_jl == NULL) {
+      G4cout << "MAIN --  begin_event_action_jl is null, exiting..." << G4endl;
+      jl_atexit_hook(0);
+      exit(0);
+    }
   }
-  else {
-    G4cout << "MAIN -- test load of Julia successful" << G4endl;
-  }
 
-
-  G4cout << "MAIN -- Calling test_func " << G4endl;
-  jl_call0(test_jl);
-
-  // jl_function_t *jl_steering = jl_get_function(jl_main_module, "steering");
-  // jl_value_t *st = jl_call0(jl_steering);
-
-
-  // jl_function_t *set_nthreads= jl_get_function(jl_main_module, "set_nthreads");
-  jl_value_t *jl_nt = jl_box_int8(nThreads);
-  // jl_call2(set_nthreads, st, jl_nthreads);
-
-
-  G4cout << "MAIN -- getting to the steering..." << G4endl;  
-
-  jl_function_t *jl_nthreads = jl_get_function(jl_main_module, "nthreads");
-  jl_function_t *jl_set_nthreads = jl_get_function(jl_main_module, "set_nthreads");
-
-  jl_call1(jl_set_nthreads, jl_nt);
-  jl_value_t *testn = jl_call0(jl_nthreads);
-  int testN = jl_unbox_int8(testn);
-  G4cout << "MAIN -- getting threads from Julia, N: " <<  testN << G4endl;  
-
-  jl_eval_string("Base.include(Main, \"./julia/custom_module.jl\")");
-  jl_eval_string("using .custom"); // load the user's module
-  
-  // jl_value_t *mod = jl_eval_string("custom");
-  // jl_function_t *f = (jl_function_t*)jl_get_global((jl_module_t*)mod,jl_symbol("begin_event"));
-
-
-  jl_function_t *begin_event_action_jl = jl_get_function(jl_main_module, "begin_event");
-  if (begin_event_action_jl == NULL) {
-    G4cout << "MAIN --  begin_event_action_jl is null, exiting..." << G4endl;
-    jl_atexit_hook(0);
-    exit(0);
-  }
+  // ####################### END JULIA SETUP ##########################
 
   G4UIExecutive* ui = nullptr;
   if (!batch) {
@@ -223,9 +222,10 @@ int main(int argc,char** argv) {
 
   // Cleanup. User actions, the physics list and the detector description are owned and
   // deleted by the run manager, so don't delete them here
-
-  // Handle the Julia GC mechanics, on exit:
-  jl_gc_safe_leave(jl_current_task->ptls, state);
+  
+  if (Steering::callback) {
+    jl_gc_safe_leave(jl_current_task->ptls, state); // Handle the Julia GC mechanics, on exit:
+  }
 
   delete visManager;
   delete runManager;
