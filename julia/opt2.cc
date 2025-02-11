@@ -85,8 +85,16 @@ int main(int argc,char** argv) {
     jl_init(); /* required: setup the Julia context */
         state = jl_gc_safe_enter(jl_current_task->ptls); // Handle the Julia GC mechanics, before execution:
 
-    jl_eval_string("Base.include(Main, \"./julia/steering.jl\")");
-    jl_eval_string("using .steering"); // load the user's module
+    
+    //    jl_eval_string("Base.include(Main, \"./julia/steering.jl\")");
+   
+    jl_eval_string("include(\"./julia/steering.jl\")");
+    //jl_eval_string("using .steering"); // load the user's module
+
+    jl_eval_string("include(\"./julia/custom_module.jl\")");
+    jl_eval_string("using .custom");
+
+    // jl_eval_string("using Plots"); // test
 
     jl_eval_string("println(sqrt(2.0))"); // check Julia is alive
 
@@ -115,8 +123,8 @@ int main(int argc,char** argv) {
     G4cout << "MAIN -- getting threads from Julia, N: " <<  testN << G4endl;  
 
     // The actual payload Julia code is loaded here
-    jl_eval_string("Base.include(Main, \"./julia/custom_module.jl\")");
-    jl_eval_string("using .custom"); // load the user's module
+    // jl_eval_string("Base.include(Main, \"./julia/custom_module.jl\")");
+    // jl_eval_string("using .custom"); // load the user's module
 
     jl_function_t *begin_event_action_jl = jl_get_function(jl_main_module, "begin_event");
     if (begin_event_action_jl == NULL) {

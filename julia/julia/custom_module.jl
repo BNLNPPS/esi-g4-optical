@@ -1,9 +1,10 @@
 module custom
 
-using ..steering
-using Parameters
 using FHist
+#using Plots
+using Parameters
 
+using ..steering
 
 println("=====> Loading custom_module.jl")
 println("=====> ", nthreads())
@@ -21,7 +22,7 @@ end
 # FIXME -- need to find a way to init this with the actual number of threads.
 const simdata = [MyData() for i in 1:16] 
 
-total_h1 = Hist1D(; binedges = 0.0:0.5:20.0)
+total_h1 = Hist1D(; binedges = 0.0:0.5:100.0)
 
 
 function getMyData(thread::Int8)
@@ -41,7 +42,9 @@ function end_run()
   tot = FHist.integral(total_h1)
 
   println("-------------------> ", tot)
-  # img = plot(h.hist, title=h.title)
+  img = plot(total_h1, title="foo")
+  savefig(img, "foo.png")
+  println("=====> edepHist.png saved")
   return
 end
 
