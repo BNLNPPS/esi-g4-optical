@@ -1,7 +1,9 @@
+# using Plots
+
 module custom
 
 using FHist
-#using Plots
+# using Plots
 using Parameters
 
 println("=====> Loading custom_module.jl")

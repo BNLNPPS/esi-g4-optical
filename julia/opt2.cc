@@ -86,14 +86,19 @@ int main(int argc,char** argv) {
 
     state = jl_gc_safe_enter(jl_current_task->ptls); // Handle the Julia GC mechanics, before execution:
   
-    // Retiting the steering module
-    // jl_eval_string("include(\"./julia/steering.jl\")");
-  
+    jl_eval_string("import Plots"); // test
+
+    if (jl_exception_occurred()) {
+      G4cout << "Julia exception: " << jl_typeof_str(jl_exception_occurred()) << G4endl;
+      jl_atexit_hook(0); // exit Julia
+      exit(-1);
+    }
+
+
     jl_eval_string("include(\"./julia/custom_module.jl\")");
     jl_eval_string("using .custom");
 
-    // jl_eval_string("using Plots"); // test
-
+    jl_eval_string("plot(rand(1000))");
 
     G4cout << "MAIN -- check if Julia is alive, expecting sqrt(2): " << G4endl;
     jl_eval_string("println(sqrt(2.0))"); // check Julia is alive
@@ -230,7 +235,9 @@ int main(int argc,char** argv) {
   delete visManager;
   delete runManager;
 
-  jl_atexit_hook(0); // exit Julia
+  if (Steering::callback) {
+    jl_atexit_hook(0); // exit Julia
+  }
 
 }
 
@@ -252,7 +259,8 @@ int main(int argc,char** argv) {
     // jl_eval_string("using .custom"); // load the user's module
     // ---
 
-
+    // The updated way to include, now the module is retired anyhow
+    // jl_eval_string("include(\"./julia/steering.jl\")");
 
 
 // The old CLI UI, kept for reference only
