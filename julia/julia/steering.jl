@@ -1,4 +1,4 @@
-#module steering
+module steering
 #using Plots
 # ----
 
@@ -22,9 +22,9 @@ end
 
 # ---
 function test_func() # just to check if the loading works -- a summy function
-  return
+  return 3
 end
 
-#export set_nthreads, nthreads, test_func
+export set_nthreads, nthreads, test_func
 
-#end
+end

@@ -44,7 +44,7 @@ int main(int argc,char** argv) {
     | lyra::opt(nevents, "nevents")         ["-n"]["--nevents"]       ("Optional: number of events").optional()
     | lyra::opt(threads, "threads")         ["-t"]["--threads"]       ("Optional: number of threads").optional()
     | lyra::opt(batch)                      ["-b"]["--batch"]         ("Optional batch mode").optional()
-    | lyra::opt(callback)                   ["-c"]["--callback"]      ("Optional: callback mode").optional()
+    | lyra::opt(callback)                   ["-j"]["--julia"]         ("Optional: Julia callback mode").optional()
     | lyra::opt(analysis)                   ["-a"]["--analysis"]      ("Optional: analysis mode").optional()
     | lyra::opt(verbose)                    ["-v"]["--verbose"]       ("Optional: verbose mode").optional()
     | lyra::opt(help)                       ["-h"]["--help"]          ("Help").optional();
@@ -83,19 +83,19 @@ int main(int argc,char** argv) {
    // ####################### START JULIA SETUP ##########################
   if (Steering::callback) {
     jl_init(); /* required: setup the Julia context */
-        state = jl_gc_safe_enter(jl_current_task->ptls); // Handle the Julia GC mechanics, before execution:
 
-    
-    //    jl_eval_string("Base.include(Main, \"./julia/steering.jl\")");
-   
-    jl_eval_string("include(\"./julia/steering.jl\")");
-    //jl_eval_string("using .steering"); // load the user's module
-
+    state = jl_gc_safe_enter(jl_current_task->ptls); // Handle the Julia GC mechanics, before execution:
+  
+    // Retiting the steering module
+    // jl_eval_string("include(\"./julia/steering.jl\")");
+  
     jl_eval_string("include(\"./julia/custom_module.jl\")");
     jl_eval_string("using .custom");
 
     // jl_eval_string("using Plots"); // test
 
+
+    G4cout << "MAIN -- check if Julia is alive, expecting sqrt(2): " << G4endl;
     jl_eval_string("println(sqrt(2.0))"); // check Julia is alive
 
     jl_function_t* test_jl = jl_get_function(jl_main_module, "test_func");
@@ -111,7 +111,11 @@ int main(int argc,char** argv) {
 
 
     G4cout << "MAIN -- Calling test_func " << G4endl;
-    jl_call0(test_jl);
+
+    jl_value_t *tf = jl_call0(test_jl); // just a "ping"
+    int tF = jl_unbox_int8(tf);
+    G4cout << "MAIN -- return from test_func... " <<  tF << G4endl;
+
     jl_value_t *jl_nt = jl_box_int8(nThreads);
     G4cout << "MAIN -- getting to the steering..." << G4endl;  
     jl_function_t *jl_nthreads = jl_get_function(jl_main_module, "nthreads");
@@ -122,18 +126,15 @@ int main(int argc,char** argv) {
     int testN = jl_unbox_int8(testn);
     G4cout << "MAIN -- getting threads from Julia, N: " <<  testN << G4endl;  
 
-    // The actual payload Julia code is loaded here
-    // jl_eval_string("Base.include(Main, \"./julia/custom_module.jl\")");
-    // jl_eval_string("using .custom"); // load the user's module
-
     jl_function_t *begin_event_action_jl = jl_get_function(jl_main_module, "begin_event");
     if (begin_event_action_jl == NULL) {
       G4cout << "MAIN --  begin_event_action_jl is null, exiting..." << G4endl;
       jl_atexit_hook(0);
       exit(0);
     }
-  }
+  }  // --- if callback
 
+  // exit(0);
   // ####################### END JULIA SETUP ##########################
 
   G4UIExecutive* ui = nullptr;
@@ -190,9 +191,8 @@ int main(int argc,char** argv) {
   auto UImanager = G4UImanager::GetUIpointer();
 
 
-
   // ################################################################################
-  // Process macro. run the default sequence or start UI session
+  // Process macro, run the default sequence or start UI session
   
   if (batch) {
     if(macro.size()) {
@@ -237,6 +237,24 @@ int main(int argc,char** argv) {
 
 
 // #############################################################################
+
+
+    // ---
+    // This was in the first version of this code:
+    //    jl_eval_string("Base.include(Main, \"./julia/steering.jl\")");
+    //    jl_eval_string("using .steering"); // load the user's module
+    // ---
+
+    // ---
+    // This was in the first version of this code:
+    // The actual payload Julia code is loaded here
+    // jl_eval_string("Base.include(Main, \"./julia/custom_module.jl\")");
+    // jl_eval_string("using .custom"); // load the user's module
+    // ---
+
+
+
+
 // The old CLI UI, kept for reference only
 //   for ( G4int i=1; i<argc; i=i+2 ) {
 //     if      ( G4String(argv[i]) == "-m" ) macro = argv[i+1];
