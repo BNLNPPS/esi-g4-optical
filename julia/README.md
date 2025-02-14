@@ -43,6 +43,26 @@ In the _build_ folder, it is convenient to run:
 cmake ../ -B . && make -j6
 ```
 
+## Running
+
+Current name of the executable is _Opt2_, and the command line options are as follows:
+
+```bash
+USAGE:
+  Opt2 [-o|--output_file <output_file>] [-m|--macro <macro>] [-n|--nevents <nevents>] [-t|--threads <threads>] [-b|--batch] [-j|--julia] [-a|--analysis] [-v|--verbose] [-h|--help]
+
+OPTIONS, ARGUMENTS:
+  -o, --output_file <output_file>
+                          Output file, default empty
+  -m, --macro <macro>     Optional macro
+  -n, --nevents <nevents> Optional: number of events  [default: 100]
+  -t, --threads <threads> Optional: number of threads [default: 0]
+  -b, --batch             Optional batch mode
+  -j, --julia             Optional: Julia callback mode
+  -a, --analysis          Optional: analysis mode
+  -v, --verbose           Optional: verbose mode
+  -h, --help              Help
+```
 
 ## Julia
 
