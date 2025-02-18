@@ -1,0 +1,13 @@
+# Initialize kernel
+/run/initialize
+#
+/control/verbose 0
+/tracking/verbose 0
+# muon 300 MeV in direction (0.,0.,1.)
+/gun/particle anti_proton #mu+
+/gun/energy 300 MeV
+#
+# Only need this if accidentally overwrote in the code
+# /run/printProgress 0
+/run/beamOn 1000
+
