@@ -1,4 +1,24 @@
 // ---
+#include "DetectorConstruction.hh"
+#include "ActionInitialization.hh"
+#include "WorkerInitialization.hh"
+
+#include "G4RunManagerFactory.hh"
+
+#include "G4SteppingVerbose.hh"
+#include "G4UIcommand.hh"
+#include "G4UImanager.hh"
+
+#include "G4UIExecutive.hh"
+// #include "G4VisExecutive.hh" -- crashes julia
+#include "Randomize.hh"
+
+
+// important for optical
+// #include "G4EmStandardPhysics_option4.hh"
+// #include "G4OpticalPhysics.hh"
+// #include "FTFP_BERT.hh"
+
 #include <iostream>
 #include <julia.h>
 #include "lyra.hpp"
@@ -10,6 +30,17 @@ JULIA_DEFINE_FAST_TLS // only define this once, in an executable
 using namespace std;
 
 int main(int argc,char** argv) {
+  // G4cout << "Start"  << G4endl;
+
+  bool help=false, batch=false, analysis=false, callback=false, verbose=false;
+  auto cli = lyra::cli()
+    | lyra::opt(batch)                      ["-b"]["--batch"]         ("Optional batch mode").optional()
+    | lyra::opt(callback)                   ["-j"]["--julia"]         ("Optional: Julia callback mode").optional()
+    | lyra::opt(analysis)                   ["-a"]["--analysis"]      ("Optional: analysis mode").optional()
+    | lyra::opt(verbose)                    ["-v"]["--verbose"]       ("Optional: verbose mode").optional()
+    | lyra::opt(help)                       ["-h"]["--help"]          ("Help").optional();
+
+  auto result = cli.parse({ argc, argv });
 
   jl_init(); /* required: setup the Julia context */
 
