@@ -1,9 +1,7 @@
-# using Plots
-
 module custom
 
 using FHist
-# using Plots
+using Plots
 using Parameters
 
 println("=====> Loading custom_module.jl")
@@ -101,7 +99,7 @@ end
 
 # ---
 export set_nthreads, nthreads, test_func
-export stepping_action, begin_run, end_run, begin_event, end_event, getMyData
+export stepping_action, begin_run, end_run, begin_event, end_event, getMyData, test_func
 
 end
 

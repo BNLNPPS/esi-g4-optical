@@ -13,7 +13,9 @@
 #include "G4UIcommand.hh"
 #include "G4UImanager.hh"
 #include "G4UIExecutive.hh"
-#include "G4VisExecutive.hh"
+
+// #include "G4VisExecutive.hh"
+
 #include "Randomize.hh"
 
 
@@ -86,7 +88,7 @@ int main(int argc,char** argv) {
 
     state = jl_gc_safe_enter(jl_current_task->ptls); // Handle the Julia GC mechanics, before execution:
   
-    jl_eval_string("import Plots"); // test
+    // jl_eval_string("import Plots"); // test
 
     if (jl_exception_occurred()) {
       G4cout << "Julia exception: " << jl_typeof_str(jl_exception_occurred()) << G4endl;
@@ -98,7 +100,7 @@ int main(int argc,char** argv) {
     jl_eval_string("include(\"./julia/custom_module.jl\")");
     jl_eval_string("using .custom");
 
-    jl_eval_string("plot(rand(1000))");
+    // jl_eval_string("plot(rand(1000))");
 
     G4cout << "MAIN -- check if Julia is alive, expecting sqrt(2): " << G4endl;
     jl_eval_string("println(sqrt(2.0))"); // check Julia is alive
@@ -189,8 +191,8 @@ int main(int argc,char** argv) {
   runManager->SetUserInitialization(actionInitialization);
 
   // Initialize visualization and make it quiet... see /vis/verbose guidance.
-  auto visManager = new G4VisExecutive("Quiet");
-  visManager->Initialize();
+  // auto visManager = new G4VisExecutive("Quiet");
+  // visManager->Initialize();
 
   // Get the pointer to the User Interface manager
   auto UImanager = G4UImanager::GetUIpointer();
@@ -232,7 +234,7 @@ int main(int argc,char** argv) {
     jl_gc_safe_leave(jl_current_task->ptls, state); // Handle the Julia GC mechanics, on exit:
   }
 
-  delete visManager;
+  // delete visManager;
   delete runManager;
 
   if (Steering::callback) {
