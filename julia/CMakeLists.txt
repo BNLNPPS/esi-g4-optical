@@ -49,6 +49,7 @@ target_link_libraries(Opt2 ${Geant4_LIBRARIES} julia)
 set(OPTICAL2_SCRIPTS
   julia/steering.jl
   julia/custom_module.jl
+  julia/my_module.jl  
   example.in
   gui.mac
   init_vis.mac

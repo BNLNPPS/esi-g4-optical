@@ -29,7 +29,8 @@ void ActionInitialization::BuildForMaster() const {
     G4cout << "Master: output file not specified" << G4endl;
   }
 
-  G4cout << "MASTER: checking Julia sqrt(2) ";  jl_eval_string("println(sqrt(2.0))");
+  G4cout << "MASTER: checking Julia sqrt(2) " << G4endl; 
+  jl_eval_string("println(sqrt(2.0))");
 }
 
 // --- WORKER

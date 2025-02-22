@@ -57,6 +57,7 @@ int main(int argc,char** argv) {
   // Optionally, print help and exit:
   if(help) {std::cout << cli << std::endl; exit(0);}
 
+
   // ----------------------------------------------------------------------------------------------------------------
 
   G4String  session;
@@ -80,24 +81,32 @@ int main(int argc,char** argv) {
   if(output_file.size())  {G4cout << "output file:"   << output_file  << G4endl;} else {G4cout << "output file not specified" << G4endl;}
   if(macro.size())        {G4cout << "macro file:"    << macro        << G4endl;} else {G4cout << "macro file not specified"  << G4endl;}
 
+ 
 
-  int8_t state=0;
+  int8_t st=0;
    // ####################### START JULIA SETUP ##########################
   if (Steering::callback) {
+
+    G4cout << "MAIN -- initiating Julia callback" << G4endl;
+
     jl_init(); /* required: setup the Julia context */
 
-    state = jl_gc_safe_enter(jl_current_task->ptls); // Handle the Julia GC mechanics, before execution:
-  
-    // jl_eval_string("import Plots"); // test
+    st = jl_gc_safe_enter(jl_current_task->ptls); // Handle the Julia GC mechanics, before execution:
 
+    // if (jl_exception_occurred()) {
+    //   G4cout << "Julia exception: " << jl_typeof_str(jl_exception_occurred()) << G4endl;
+    //   jl_atexit_hook(0); // exit Julia
+    //   exit(-1);
+    // }
+
+
+    jl_eval_string("include(\"./julia/my_module.jl\")");
     if (jl_exception_occurred()) {
-      G4cout << "Julia exception: " << jl_typeof_str(jl_exception_occurred()) << G4endl;
+      G4cout << "Julia exception when loading: " << jl_typeof_str(jl_exception_occurred()) << G4endl;
       jl_atexit_hook(0); // exit Julia
       exit(-1);
     }
-
-
-    jl_eval_string("include(\"./julia/custom_module.jl\")");
+      
     jl_eval_string("using .custom");
 
     // jl_eval_string("plot(rand(1000))");
@@ -113,9 +122,8 @@ int main(int argc,char** argv) {
       exit(0);
     }
     else {
-      G4cout << "MAIN -- test load of Julia successful" << G4endl;
+      G4cout << "MAIN -- test load of a Julia function test_func successful" << G4endl;
     }
-
 
     G4cout << "MAIN -- Calling test_func " << G4endl;
 
@@ -141,14 +149,15 @@ int main(int argc,char** argv) {
     }
   }  // --- if callback
 
-  // exit(0);
   // ####################### END JULIA SETUP ##########################
 
-  G4UIExecutive* ui = nullptr;
-  if (!batch) {
-    argc = 1; // -- hacky but the Executive works with argv...
-    ui = new G4UIExecutive(argc, argv); // ui = new G4UIExecutive(argc, argv, session);
-  }
+  // G4UIExecutive* ui = nullptr;
+  // if (!batch) {
+  //   argc = 1; // -- hacky but the Executive works with argv...
+  //   ui = new G4UIExecutive(argc, argv); // ui = new G4UIExecutive(argc, argv, session);
+  // }
+
+
 
   // Optionally: choose a different Random engine... G4Random::setTheEngine(new CLHEP::MTwistEngine);
 
@@ -170,6 +179,7 @@ int main(int argc,char** argv) {
     runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Serial);
   }
 
+
   // original -- auto runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
 
 
@@ -179,6 +189,7 @@ int main(int argc,char** argv) {
   runManager->SetUserInitialization(detConstruction);
 
   auto physicsList = new FTFP_BERT(0);
+
 
   // set up optics -- note that "0" in the following line really helps to reduce output,
   // which is otherwise pretty massive.
@@ -190,12 +201,14 @@ int main(int argc,char** argv) {
   auto actionInitialization = new ActionInitialization(detConstruction, output_file);
   runManager->SetUserInitialization(actionInitialization);
 
+
   // Initialize visualization and make it quiet... see /vis/verbose guidance.
   // auto visManager = new G4VisExecutive("Quiet");
   // visManager->Initialize();
 
   // Get the pointer to the User Interface manager
   auto UImanager = G4UImanager::GetUIpointer();
+
 
 
   // ################################################################################
@@ -220,18 +233,19 @@ int main(int argc,char** argv) {
     }
   }
   else  { // interactive mode : define UI session
-    G4cout << "************************ UI mode" << G4endl;
-    UImanager->ApplyCommand("/control/execute init_vis.mac");
-    if (ui->IsGUI()) {UImanager->ApplyCommand("/control/execute gui.mac");}
-    ui->SessionStart();
-    delete ui;
+    // G4cout << "************************ UI mode" << G4endl;
+    // UImanager->ApplyCommand("/control/execute init_vis.mac");
+    // if (ui->IsGUI()) {UImanager->ApplyCommand("/control/execute gui.mac");}
+    // ui->SessionStart();
+    // delete ui;
   }
+
 
   // Cleanup. User actions, the physics list and the detector description are owned and
   // deleted by the run manager, so don't delete them here
   
   if (Steering::callback) {
-    jl_gc_safe_leave(jl_current_task->ptls, state); // Handle the Julia GC mechanics, on exit:
+    jl_gc_safe_leave(jl_current_task->ptls, st); // Handle the Julia GC mechanics, on exit:
   }
 
   // delete visManager;
@@ -243,6 +257,50 @@ int main(int argc,char** argv) {
 
 }
 
+// exit(0);
+
+  // ### - test section begin
+
+  // jl_init(); /* required: setup the Julia context */
+  // int8_t st0 = jl_gc_safe_enter(jl_current_task->ptls); // Handle the Julia GC mechanics, before execution:
+  // jl_eval_string("import Plots"); // test
+
+  // jl_eval_string("include(\"./julia/my_module.jl\")");
+  // if (jl_exception_occurred()) {G4cout << "Julia exception: " << jl_typeof_str(jl_exception_occurred()) << G4endl; jl_atexit_hook(0); exit(-1);}
+
+  // jl_eval_string("using .custom");
+
+  // G4cout << "MAIN -- check if Julia is alive, expecting sqrt(2): " << G4endl;
+  // jl_eval_string("println(sqrt(2.0))"); // check Julia is alive
+
+
+  // if (jl_exception_occurred()) {G4cout << "Julia exception: " << jl_typeof_str(jl_exception_occurred()) << G4endl; jl_atexit_hook(0); exit(-1);}
+
+  // jl_function_t* test_jl1 = jl_get_function(jl_main_module, "test_func");
+
+  // if (test_jl1 == NULL) {G4cout << "MAIN --  test_jl1 is null, exiting..." << G4endl; jl_atexit_hook(0); exit(0);}
+  // else {G4cout << "MAIN -- test load of Julia successful" << G4endl;}
+
+
+  // G4cout << "MAIN -- Calling test_func " << G4endl;
+
+  // jl_value_t *tf1 = jl_call0(test_jl1);
+  // int tF1 = jl_unbox_int8(tf1);
+  // G4cout << "MAIN -- return from test_func... " <<  tF1 << G4endl;
+
+  // jl_value_t *jl_nt1 = jl_box_int8(4);
+  // G4cout << "MAIN -- getting to the steering..." << G4endl;  
+  // jl_function_t *jl_nthreads1 = jl_get_function(jl_main_module, "nthreads");
+  // jl_function_t *jl_set_nthreads1 = jl_get_function(jl_main_module, "set_nthreads");
+
+  // jl_call1(jl_set_nthreads1, jl_nt1);
+  // jl_value_t *testn1 = jl_call0(jl_nthreads1);
+  // int testN1 = jl_unbox_int8(testn1);
+  // G4cout << "MAIN -- getting threads from Julia, N: " <<  testN1 << G4endl;  
+
+  // exit(0);
+
+  // ### - test section end
 
 
 // #############################################################################

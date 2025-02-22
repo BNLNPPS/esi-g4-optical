@@ -1,34 +1,38 @@
 // ---
+
+#include "Steering.hh"
+
+// ---
 #include "DetectorConstruction.hh"
 #include "ActionInitialization.hh"
 #include "WorkerInitialization.hh"
 
 #include "G4RunManagerFactory.hh"
-
 #include "G4SteppingVerbose.hh"
 #include "G4UIcommand.hh"
 #include "G4UImanager.hh"
-
 #include "G4UIExecutive.hh"
-// #include "G4VisExecutive.hh" -- crashes julia
+
+
+// #include "G4VisExecutive.hh"
+
 #include "Randomize.hh"
 
 
 // important for optical
-// #include "G4EmStandardPhysics_option4.hh"
-// #include "G4OpticalPhysics.hh"
-// #include "FTFP_BERT.hh"
-
+#include "G4EmStandardPhysics_option4.hh"
+#include "G4OpticalPhysics.hh"
+#include "FTFP_BERT.hh"
 #include <iostream>
-#include <julia.h>
 #include "lyra.hpp"
+#include <julia.h>
+
+bool Steering::analysis, Steering::callback, Steering::verbose;
 
 JULIA_DEFINE_FAST_TLS // only define this once, in an executable
 
 // -----------------------------------------------------------
-
 using namespace std;
-
 int main(int argc,char** argv) {
   // G4cout << "Start"  << G4endl;
 
@@ -41,8 +45,18 @@ int main(int argc,char** argv) {
     | lyra::opt(help)                       ["-h"]["--help"]          ("Help").optional();
 
   auto result = cli.parse({ argc, argv });
-
+  int8_t state=0;
+  
   jl_init(); /* required: setup the Julia context */
+
+  state = jl_gc_safe_enter(jl_current_task->ptls); 
+
+  if (jl_exception_occurred()) {
+    cout << "Julia exception: " << jl_typeof_str(jl_exception_occurred()) << endl;
+    jl_atexit_hook(0); // exit Julia
+    exit(-1);
+  }
+
 
   //state = jl_gc_safe_enter(jl_current_task->ptls); // Handle the Julia GC mechanics, before execution:
   jl_eval_string("include(\"./julia/custom_module.jl\")");
