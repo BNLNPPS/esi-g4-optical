@@ -29,6 +29,8 @@
 
 bool Steering::analysis, Steering::callback, Steering::verbose;
 
+using namespace std;
+
 JULIA_DEFINE_FAST_TLS // only define this once, in an executable
 
 // -----------------------------------------------------------
@@ -38,13 +40,21 @@ int main(int argc,char** argv) {
   // We use lyra to parse the command line:
   bool help=false, batch=false, analysis=false, callback=false, verbose=false;
   G4String macro="", output_file="";
+  string htitle="My Histogram", fn="image.png";
   int threads = 0, nevents = 100;
+
+  float low=0.0, bin=0.5, high=100.0;
 
   auto cli = lyra::cli() 
     | lyra::opt(output_file, "output_file") ["-o"]["--output_file"]   ("Output file, default empty").optional()
-    | lyra::opt(macro, "macro")             ["-m"]["--macro"]         ("Optional macro").optional()
-    | lyra::opt(nevents, "nevents")         ["-n"]["--nevents"]       ("Optional: number of events").optional()
-    | lyra::opt(threads, "threads")         ["-t"]["--threads"]       ("Optional: number of threads").optional()
+    | lyra::opt(fn,          "fn")          ["-i"]["--image_file"]    ("Graphics Output file, default image.png").optional()    
+    | lyra::opt(macro,       "macro")       ["-m"]["--macro"]         ("Optional macro").optional()
+    | lyra::opt(htitle,      "title")       ["-T"]["--histogram_title"]("Histogram Title").optional()    
+    | lyra::opt(nevents,     "nevents")     ["-n"]["--nevents"]       ("Optional: number of events").optional()
+    | lyra::opt(threads,     "threads")     ["-t"]["--threads"]       ("Optional: number of threads").optional()
+    | lyra::opt(low,         "low")         ["-L"]["--low"]           ("Optional: low limit for the histogram, default 0.").optional()
+    | lyra::opt(high,        "high")        ["-H"]["--high"]          ("Optional: high limit for the histogram, default 100.").optional()
+    | lyra::opt(bin,         "bin")         ["-B"]["--bin"]           ("Optional: bin width the histogram, default 0.5").optional()
     | lyra::opt(batch)                      ["-b"]["--batch"]         ("Optional batch mode").optional()
     | lyra::opt(callback)                   ["-j"]["--julia"]         ("Optional: Julia callback mode").optional()
     | lyra::opt(analysis)                   ["-a"]["--analysis"]      ("Optional: analysis mode").optional()
@@ -76,6 +86,7 @@ int main(int argc,char** argv) {
   G4cout << "Steering::callback:"     << Steering::callback << G4endl;
   G4cout << "Steering::verbose:"      << Steering::verbose  << G4endl;
   G4cout << "threads:"                << nThreads           << G4endl;
+  G4cout << "histogram parameters:"   << low << ' ' << bin << ' ' << high  << G4endl;
 
   
   if(output_file.size())  {G4cout << "output file:"   << output_file  << G4endl;} else {G4cout << "output file not specified" << G4endl;}
@@ -133,13 +144,52 @@ int main(int argc,char** argv) {
 
     jl_value_t *jl_nt = jl_box_int8(nThreads);
     G4cout << "MAIN -- getting to the steering..." << G4endl;  
-    jl_function_t *jl_nthreads = jl_get_function(jl_main_module, "nthreads");
+
+    jl_value_t *jl_low = jl_box_float64(low);
+    jl_value_t *jl_bin = jl_box_float64(bin);
+    jl_value_t *jl_high = jl_box_float64(high);    
+
+    jl_function_t *jl_nthreads  = jl_get_function(jl_main_module, "nthreads");
+    jl_function_t *jl_title     = jl_get_function(jl_main_module, "title");
+    jl_function_t *jl_set_title = jl_get_function(jl_main_module, "set_title");
+    jl_function_t *jl_set_fn    = jl_get_function(jl_main_module, "set_fn");
+
+    jl_function_t *jl_set_hist  = jl_get_function(jl_main_module, "set_hist");
+
+    jl_call3(jl_set_hist, jl_low, jl_bin, jl_high);
+
+    jl_value_t *testn0 = jl_call0(jl_nthreads);
+    int testN0 = jl_unbox_int8(testn0);
+    G4cout << "MAIN -- default threads from Julia, N: " <<  testN0 << G4endl;
+
+    jl_value_t *title = jl_call0(jl_title);
+
+    const char *unboxed = jl_string_ptr(title); 
+    G4cout << "MAIN -- default histogram title from Julia: " << unboxed << G4endl;
+
+    // char const *julia = "julia";
+
+    // string julia = title;
+
+    jl_value_t *jtitle  = jl_cstr_to_string(htitle.c_str());
+    jl_value_t *jfn     = jl_cstr_to_string(fn.c_str());
+
+    // jl_value_t *argument = jl_box_char(*julia);
+    jl_call1(jl_set_title,  jtitle);
+    jl_call1(jl_set_fn,     jfn);
+
+    title = jl_call0(jl_title);
+
+    unboxed = jl_string_ptr(title); 
+    G4cout << "MAIN -- updated histogram title from Julia: " << unboxed << G4endl;
+
+
     jl_function_t *jl_set_nthreads = jl_get_function(jl_main_module, "set_nthreads");
 
     jl_call1(jl_set_nthreads, jl_nt);
     jl_value_t *testn = jl_call0(jl_nthreads);
     int testN = jl_unbox_int8(testn);
-    G4cout << "MAIN -- getting threads from Julia, N: " <<  testN << G4endl;  
+    G4cout << "MAIN -- updated threads from Julia, N: " <<  testN << G4endl;  
 
     jl_function_t *begin_event_action_jl = jl_get_function(jl_main_module, "begin_event");
     if (begin_event_action_jl == NULL) {
@@ -148,6 +198,8 @@ int main(int argc,char** argv) {
       exit(0);
     }
   }  // --- if callback
+
+  // exit(0);
 
   // ####################### END JULIA SETUP ##########################
 
@@ -232,7 +284,7 @@ int main(int argc,char** argv) {
       UImanager->ApplyCommand( beam + std::to_string(nevents));
     }
   }
-  else  { // interactive mode : define UI session
+  else  { // interactive mode : define UI session. NB breaks Julia...
     // G4cout << "************************ UI mode" << G4endl;
     // UImanager->ApplyCommand("/control/execute init_vis.mac");
     // if (ui->IsGUI()) {UImanager->ApplyCommand("/control/execute gui.mac");}
@@ -244,11 +296,11 @@ int main(int argc,char** argv) {
   // Cleanup. User actions, the physics list and the detector description are owned and
   // deleted by the run manager, so don't delete them here
   
-  if (Steering::callback) {
-    jl_gc_safe_leave(jl_current_task->ptls, st); // Handle the Julia GC mechanics, on exit:
+  if (Steering::callback) { // Handle the Julia GC mechanics, on exit
+    jl_gc_safe_leave(jl_current_task->ptls, st); 
   }
 
-  // delete visManager;
+  // delete visManager; -- commented out since the visManager breaks Julia
   delete runManager;
 
   if (Steering::callback) {
